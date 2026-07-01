@@ -34,6 +34,8 @@ import {
   Users,
   FileDown,
   Edit,
+  List as ListIcon,
+  LayoutGrid,
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
@@ -72,6 +74,7 @@ export default function DesignEventsCalendar() {
   const [eventDialogOpen, setEventDialogOpen] = useState(false)
   
   // Add Event State
+  const [viewMode, setViewMode] = useState<"calendar" | "list">("calendar")
   const [localEvents, setLocalEvents] = useState<Event[]>(eventsData)
   const [addEventDialogOpen, setAddEventDialogOpen] = useState(false)
   const [editingEventId, setEditingEventId] = useState<string | null>(null)
@@ -243,7 +246,7 @@ export default function DesignEventsCalendar() {
       endTime,
       category: event.eventType || "Meeting",
       color: event.color || "Blue",
-      tags: [],
+      tags: event.tags || [],
     })
     
     setEventDialogOpen(false)
@@ -273,6 +276,7 @@ export default function DesignEventsCalendar() {
       eventType: newEvent.category,
       description: newEvent.description,
       color: newEvent.color,
+      tags: newEvent.tags,
     }
 
     if (editingEventId) {
@@ -373,6 +377,24 @@ export default function DesignEventsCalendar() {
             <div className="flex items-center justify-between flex-wrap gap-4">
               {/* Left side: Search and filters */}
               <div className="flex items-center gap-4 flex-wrap">
+                {/* View Toggle */}
+                <div className="flex bg-[#121214] p-1 rounded-md border border-[#2a2a2c]">
+                  <button 
+                    onClick={() => setViewMode("calendar")}
+                    className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-sm transition-colors ${viewMode === "calendar" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                  >
+                    <LayoutGrid className="h-4 w-4" />
+                    Calendar
+                  </button>
+                  <button 
+                    onClick={() => setViewMode("list")}
+                    className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-sm transition-colors ${viewMode === "list" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                  >
+                    <ListIcon className="h-4 w-4" />
+                    List
+                  </button>
+                </div>
+
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -871,78 +893,68 @@ export default function DesignEventsCalendar() {
                 <h2 className="text-4xl font-thin">{month}</h2>
               </div>
 
-              <div className="flex-1 grid grid-cols-7 gap-px bg-border border border-border">
-                {monthData.map((day, index) => (
-                  <div
-                    key={index}
-                    onClick={() => {
-                      if (day.date) openAddEventDialog(day.date, month)
-                    }}
-                    className={`bg-background p-2 min-h-[120px] transition-colors hover:bg-accent/50 ${day.date ? "cursor-pointer" : ""} ${
-                      isToday(day.date) ? "ring-2 ring-inset ring-primary" : ""
-                    }`}
-                  >
-                    {day.date && (
-                      <>
-                        <h3 className={`mb-2 font-mono font-light text-7xl ${isToday(day.date) ? "text-primary" : ""}`}>
-                          {day.date}
-                        </h3>
-                        <div className="space-y-2">
-                          {day.events.map((event, eventIndex) => {
-                            const eventId = `${event.month}-${event.name}-${event.startDay}`
-                            const isSaved = isEventSaved(event)
+              {viewMode === "calendar" ? (
+                <div className="flex-1 grid grid-cols-7 gap-px bg-border border border-border">
+                  {monthData.map((day, index) => (
+                    <div
+                      key={index}
+                      onClick={() => {
+                        if (day.date) openAddEventDialog(day.date, month)
+                      }}
+                      className={`bg-background p-2 min-h-[120px] transition-colors hover:bg-accent/50 ${day.date ? "cursor-pointer" : ""} ${
+                        isToday(day.date) ? "ring-2 ring-inset ring-primary" : ""
+                      }`}
+                    >
+                      {day.date && (
+                        <>
+                          <h3 className={`mb-2 font-mono font-light text-7xl ${isToday(day.date) ? "text-primary" : ""}`}>
+                            {day.date}
+                          </h3>
+                          <div className="space-y-2">
+                            {day.events.map((event, eventIndex) => {
+                              const eventId = `${event.month}-${event.name}-${event.startDay}`
+                              const isSaved = isEventSaved(event)
 
-                            return (
-                              <div
-                                key={eventIndex}
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  handleEventClick(event)
-                                }}
-                                className={`block text-xs p-2.5 border-l-[3px] rounded-r-md transition-all hover:pl-3.5 cursor-pointer group relative shadow-sm ${
-                                  event.color === "Blue" ? "border-blue-500 bg-blue-500/10 hover:bg-blue-500/20" :
-                                  event.color === "Red" ? "border-red-500 bg-red-500/10 hover:bg-red-500/20" :
-                                  event.color === "Green" ? "border-green-500 bg-green-500/10 hover:bg-green-500/20" :
-                                  event.color === "Orange" ? "border-orange-500 bg-orange-500/10 hover:bg-orange-500/20" :
-                                  event.color === "Purple" ? "border-purple-500 bg-purple-500/10 hover:bg-purple-500/20" :
-                                  "border-primary bg-primary/5 hover:bg-primary/10"
-                                }`}
-                              >
-                                <div className={`font-semibold leading-tight mb-0.5 ${
-                                  event.color === "Blue" ? "text-blue-400" :
-                                  event.color === "Red" ? "text-red-400" :
-                                  event.color === "Green" ? "text-green-400" :
-                                  event.color === "Orange" ? "text-orange-400" :
-                                  event.color === "Purple" ? "text-purple-400" :
-                                  "text-foreground"
-                                }`}>{event.name}</div>
-                                {event.edition && (
-                                  <span className="inline-block mt-1 text-[10px] bg-background px-1 py-0.5 rounded">
-                                    {event.edition}
-                                  </span>
-                                )}
-                                <div className="mt-1 flex items-center text-muted-foreground/80">
-                                  <Clock className="h-3 w-3 mr-1" />
-                                  <span>{event.time}</span>
-                                </div>
-                                {event.location && (
-                                  <div className="text-muted-foreground mt-1 flex items-center justify-between">
-                                    <span>{event.location} {event.flag}</span>
+                              return (
+                                <div
+                                  key={eventIndex}
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleEventClick(event)
+                                  }}
+                                  className={`block text-xs p-2.5 border-l-[3px] rounded-r-md transition-all hover:pl-3.5 cursor-pointer group relative shadow-sm ${
+                                    event.color === "Blue" ? "border-blue-500 bg-blue-500/10 hover:bg-blue-500/20" :
+                                    event.color === "Red" ? "border-red-500 bg-red-500/10 hover:bg-red-500/20" :
+                                    event.color === "Green" ? "border-green-500 bg-green-500/10 hover:bg-green-500/20" :
+                                    event.color === "Orange" ? "border-orange-500 bg-orange-500/10 hover:bg-orange-500/20" :
+                                    event.color === "Purple" ? "border-purple-500 bg-purple-500/10 hover:bg-purple-500/20" :
+                                    "border-primary bg-primary/5 hover:bg-primary/10"
+                                  }`}
+                                >
+                                  <div className={`font-semibold leading-tight mb-0.5 ${
+                                    event.color === "Blue" ? "text-blue-400" :
+                                    event.color === "Red" ? "text-red-400" :
+                                    event.color === "Green" ? "text-green-400" :
+                                    event.color === "Orange" ? "text-orange-400" :
+                                    event.color === "Purple" ? "text-purple-400" :
+                                    "text-foreground"
+                                  }`}>{event.name}</div>
+                                  {event.edition && (
+                                    <span className="inline-block mt-1 text-[10px] bg-background px-1 py-0.5 rounded">
+                                      {event.edition}
+                                    </span>
+                                  )}
+                                  <div className="mt-1 flex items-center text-muted-foreground/80">
+                                    <Clock className="h-3 w-3 mr-1" />
+                                    <span>{event.time}</span>
                                   </div>
-                                )}
+                                  {event.location && (
+                                    <div className="text-muted-foreground mt-1 flex items-center justify-between">
+                                      <span>{event.location} {event.flag}</span>
+                                    </div>
+                                  )}
 
-                                <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation()
-                                      handleAddToCalendar(event, month)
-                                    }}
-                                    className="p-1 hover:bg-background rounded"
-                                    title="Add to calendar"
-                                  >
-                                    <CalendarPlus className="h-3 w-3" />
-                                  </button>
-                                  {isLoggedIn && (
+                                  <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                     <button
                                       onClick={(e) => {
                                         e.stopPropagation()
