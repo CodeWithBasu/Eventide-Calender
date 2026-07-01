@@ -504,28 +504,28 @@ export default function DesignEventsCalendar() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between flex-wrap gap-4">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
               {/* Left side: Search and filters */}
-              <div className="flex items-center gap-4 flex-wrap">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full lg:w-auto">
                 {/* View Toggle */}
-                <div className="flex bg-[#121214] p-1 rounded-md border border-[#2a2a2c]">
+                <div className="flex bg-[#121214] p-1 rounded-md border border-[#2a2a2c] w-full sm:w-auto">
                   <button 
                     onClick={() => setViewMode("calendar")}
-                    className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-sm transition-colors ${viewMode === "calendar" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                    className={`flex-1 sm:flex-none flex justify-center items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-sm transition-colors ${viewMode === "calendar" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
                   >
                     <LayoutGrid className="h-4 w-4" />
                     Calendar
                   </button>
                   <button 
                     onClick={() => setViewMode("list")}
-                    className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-sm transition-colors ${viewMode === "list" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                    className={`flex-1 sm:flex-none flex justify-center items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-sm transition-colors ${viewMode === "list" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
                   >
                     <ListIcon className="h-4 w-4" />
                     List
                   </button>
                 </div>
 
-                <div className="relative">
+                <div className="relative w-full sm:w-[200px]">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <SmoothInput
                     type="search"
@@ -533,13 +533,13 @@ export default function DesignEventsCalendar() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-9 text-sm py-1.5 h-9"
-                    wrapperClassName="w-[200px] border border-input rounded-md"
+                    wrapperClassName="w-full border border-input rounded-md"
                   />
                 </div>
 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="default">
+                    <Button variant="outline" size="default" className="w-full sm:w-auto justify-between">
                       Choose a month
                       <ChevronDown />
                     </Button>
@@ -555,7 +555,7 @@ export default function DesignEventsCalendar() {
 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="default">
+                    <Button variant="outline" size="default" className="w-full sm:w-auto justify-between">
                       {selectedContinent || "Filter by Continent"}
                       <ChevronDown />
                     </Button>
@@ -572,7 +572,7 @@ export default function DesignEventsCalendar() {
 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="default">
+                    <Button variant="outline" size="default" className="w-full sm:w-auto justify-between">
                       {selectedEventType
                         ? selectedEventType.charAt(0).toUpperCase() + selectedEventType.slice(1)
                         : "Event Type"}
@@ -1067,9 +1067,9 @@ export default function DesignEventsCalendar() {
           }
 
           return (
-            <div key={month} id={month.toLowerCase()} className="mb-16 flex gap-8">
-              <div className="w-[180px] shrink-0 sticky top-[170px] self-start h-fit">
-                <h2 className="text-4xl font-thin">{month}</h2>
+            <div key={month} id={month.toLowerCase()} className="mb-16 flex flex-col lg:flex-row gap-4 lg:gap-8 relative">
+              <div className="w-full lg:w-[180px] shrink-0 sticky top-[150px] lg:top-[170px] self-start h-fit bg-background/90 backdrop-blur-md z-10 py-2 lg:py-0 -mx-6 px-6 lg:mx-0 lg:px-0">
+                <h2 className="text-3xl lg:text-4xl font-thin">{month}</h2>
               </div>
 
               {viewMode === "calendar" ? (
@@ -1080,13 +1080,13 @@ export default function DesignEventsCalendar() {
                       onClick={() => {
                         if (day.date) openAddEventDialog(day.date, month)
                       }}
-                      className={`bg-background p-2 min-h-[120px] transition-colors hover:bg-accent/50 ${day.date ? "cursor-pointer" : ""} ${
+                      className={`bg-background p-1 sm:p-2 min-h-[80px] sm:min-h-[120px] transition-colors hover:bg-accent/50 ${day.date ? "cursor-pointer" : ""} ${
                         isToday(day.date) ? "ring-2 ring-inset ring-primary" : ""
                       }`}
                     >
                       {day.date && (
                         <>
-                          <h3 className={`mb-2 font-mono font-light text-7xl ${isToday(day.date) ? "text-primary" : ""}`}>
+                          <h3 className={`mb-1 sm:mb-2 font-mono font-light text-3xl sm:text-7xl ${isToday(day.date) ? "text-primary" : ""}`}>
                             {day.date}
                           </h3>
                           <div className="space-y-2">
@@ -1101,7 +1101,7 @@ export default function DesignEventsCalendar() {
                                     e.stopPropagation()
                                     handleEventClick(event)
                                   }}
-                                  className={`block text-xs p-2.5 border-l-[3px] rounded-r-md transition-all hover:pl-3.5 cursor-pointer group relative shadow-sm ${
+                                  className={`block text-[9px] sm:text-xs p-1 sm:p-2.5 border-l-2 sm:border-l-[3px] rounded-r-md transition-all hover:pl-2 sm:hover:pl-3.5 cursor-pointer group relative shadow-sm ${
                                     event.color === "Blue" ? "border-blue-500 bg-blue-500/10 hover:bg-blue-500/20" :
                                     event.color === "Red" ? "border-red-500 bg-red-500/10 hover:bg-red-500/20" :
                                     event.color === "Green" ? "border-green-500 bg-green-500/10 hover:bg-green-500/20" :
@@ -1110,7 +1110,7 @@ export default function DesignEventsCalendar() {
                                     "border-primary bg-primary/5 hover:bg-primary/10"
                                   }`}
                                 >
-                                  <div className={`font-semibold leading-tight mb-0.5 ${
+                                  <div className={`font-semibold leading-tight mb-0.5 line-clamp-1 sm:line-clamp-none break-all sm:break-normal ${
                                     event.color === "Blue" ? "text-blue-400" :
                                     event.color === "Red" ? "text-red-400" :
                                     event.color === "Green" ? "text-green-400" :
@@ -1119,16 +1119,16 @@ export default function DesignEventsCalendar() {
                                     "text-foreground"
                                   }`}>{event.name}</div>
                                   {event.edition && (
-                                    <span className="inline-block mt-1 text-[10px] bg-background px-1 py-0.5 rounded">
+                                    <span className="hidden sm:inline-block mt-1 text-[10px] bg-background px-1 py-0.5 rounded">
                                       {event.edition}
                                     </span>
                                   )}
-                                  <div className="mt-1 flex items-center text-muted-foreground/80">
+                                  <div className="hidden sm:flex mt-1 items-center text-muted-foreground/80">
                                     <Clock className="h-3 w-3 mr-1" />
                                     <span>{event.time}</span>
                                   </div>
                                   {event.location && (
-                                    <div className="text-muted-foreground mt-1 flex items-center justify-between">
+                                    <div className="hidden sm:flex text-muted-foreground mt-1 items-center justify-between">
                                       <span>{event.location} {event.flag}</span>
                                     </div>
                                   )}
