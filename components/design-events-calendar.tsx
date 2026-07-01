@@ -59,6 +59,7 @@ import {
   Calendar as CalendarIcon
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { motion } from "framer-motion"
 
 const months = [
   "January",
@@ -508,14 +509,26 @@ export default function DesignEventsCalendar() {
           <nav className="flex flex-col gap-4">
             {/* Row 1: Title and dark mode toggle */}
             <div className="flex items-start justify-between">
-              <div className="flex flex-col">
-                <h1 className="text-xl font-bold">
-                  <a href="/" className="hover:underline font-medium leading-7">
-                    Design Events Guide 2026
+              <motion.div 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                className="flex flex-col"
+              >
+                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+                  <a href="/" className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent hover:opacity-80 transition-opacity">
+                    Eventide
                   </a>
                 </h1>
-                <p className="text-sm text-muted-foreground">Your guide to UX/UI, motion and graphic design events</p>
-              </div>
+                <motion.p 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.6, delay: 0.3 }}
+                  className="text-sm text-muted-foreground mt-0.5"
+                >
+                  Your guide to UX/UI, motion and graphic design events
+                </motion.p>
+              </motion.div>
               {/* Dark mode toggle and Mobile Menu */}
               <div className="flex items-center gap-2">
                 <ThemeToggleButton variant="polygon" start="top-left" blur={true} />
