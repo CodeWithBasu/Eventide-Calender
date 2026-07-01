@@ -8,6 +8,7 @@ import { downloadICS } from "@/lib/generate-ics"
 import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { ThemeToggleButton } from "./theme-toggle"
 import { Label } from "@/components/ui/label"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import {
@@ -61,7 +62,6 @@ export default function DesignEventsCalendar() {
   const [selectedContinent, setSelectedContinent] = useState<string | null>(null)
   const [selectedEventType, setSelectedEventType] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
-  const [isDarkMode, setIsDarkMode] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [userEmail, setUserEmail] = useState("")
   const [savedEvents, setSavedEvents] = useState<string[]>([])
@@ -92,17 +92,6 @@ export default function DesignEventsCalendar() {
   const { toast } = useToast()
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme")
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches
-    const shouldBeDark = savedTheme === "dark" || (!savedTheme && prefersDark)
-
-    setIsDarkMode(shouldBeDark)
-    if (shouldBeDark) {
-      document.documentElement.classList.add("dark")
-    } else {
-      document.documentElement.classList.remove("dark")
-    }
-
     const savedUser = localStorage.getItem("demoUser")
     if (savedUser) {
       setIsLoggedIn(true)
@@ -154,19 +143,6 @@ export default function DesignEventsCalendar() {
 
   const handlePrint = () => {
     window.print()
-  }
-
-  const toggleDarkMode = () => {
-    const newDarkMode = !isDarkMode
-    setIsDarkMode(newDarkMode)
-
-    if (newDarkMode) {
-      document.documentElement.classList.add("dark")
-      localStorage.setItem("theme", "dark")
-    } else {
-      document.documentElement.classList.remove("dark")
-      localStorage.setItem("theme", "light")
-    }
   }
 
   const handleAddToCalendar = (event: Event, month: string) => {
@@ -368,9 +344,7 @@ export default function DesignEventsCalendar() {
               </div>
               {/* Dark mode toggle */}
               <div className="flex items-center gap-2">
-                <Sun className="h-4 w-4" />
-                <Switch checked={isDarkMode} onCheckedChange={toggleDarkMode} aria-label="Toggle dark mode" />
-                <Moon className="h-4 w-4" />
+                <ThemeToggleButton variant="circle-blur" start="top-right" />
               </div>
             </div>
 
