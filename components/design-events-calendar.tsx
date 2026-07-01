@@ -39,6 +39,7 @@ import {
   Users,
   FileDown,
   Edit,
+  Menu,
   List as ListIcon,
   LayoutGrid,
 } from "lucide-react"
@@ -103,6 +104,8 @@ export default function DesignEventsCalendar() {
   })
 
   const { toast } = useToast()
+
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   useEffect(() => {
     getEvents().then((data) => {
@@ -498,13 +501,21 @@ export default function DesignEventsCalendar() {
                 </h1>
                 <p className="text-sm text-muted-foreground">Your guide to UX/UI, motion and graphic design events</p>
               </div>
-              {/* Dark mode toggle */}
+              {/* Dark mode toggle and Mobile Menu */}
               <div className="flex items-center gap-2">
                 <ThemeToggleButton variant="polygon" start="top-left" blur={true} />
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  className="lg:hidden" 
+                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                >
+                  <Menu className="h-5 w-5" />
+                </Button>
               </div>
             </div>
 
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <div className={`${isMobileMenuOpen ? "flex" : "hidden"} lg:flex flex-col lg:flex-row lg:items-center justify-between gap-4 mt-2 lg:mt-0`}>
               {/* Left side: Search and filters */}
               <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full lg:w-auto">
                 {/* View Toggle */}
