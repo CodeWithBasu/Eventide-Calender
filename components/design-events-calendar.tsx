@@ -977,6 +977,90 @@ export default function DesignEventsCalendar() {
                   </div>
                 ))}
               </div>
+              ) : (
+                <div className="flex-1 space-y-6">
+                  {(() => {
+                    const monthEvents = filteredEvents.filter(e => e.month === month)
+                    monthEvents.sort((a, b) => a.startDay - b.startDay)
+
+                    const grouped = monthEvents.reduce((acc, event) => {
+                      const day = event.startDay
+                      if (!acc[day]) acc[day] = []
+                      acc[day].push(event)
+                      return acc
+                    }, {} as Record<number, Event[]>)
+
+                    if (Object.keys(grouped).length === 0) {
+                      return <div className="text-center py-12 border border-[#2a2a2c] border-dashed rounded-xl bg-[#0f0f11] text-muted-foreground">No events for {month}</div>
+                    }
+
+                    return Object.keys(grouped).map(dayStr => {
+                      const day = parseInt(dayStr)
+                      const dateObj = new Date(`${month} ${day}, 2026`)
+                      const dateStr = dateObj.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })
+                      const eventsForDay = grouped[day]
+
+                      return (
+                        <div key={day} className="space-y-3">
+                          <h3 className="text-[13px] text-muted-foreground font-medium pl-1">{dateStr}</h3>
+                          <div className="space-y-2">
+                            {eventsForDay.map((event, idx) => {
+                              const dotColor = 
+                                event.color === "Blue" ? "bg-blue-500" :
+                                event.color === "Red" ? "bg-red-500" :
+                                event.color === "Green" ? "bg-green-500" :
+                                event.color === "Orange" ? "bg-orange-500" :
+                                event.color === "Purple" ? "bg-purple-500" :
+                                "bg-primary"
+
+                              return (
+                                <div 
+                                  key={idx} 
+                                  onClick={() => handleEventClick(event)}
+                                  className="flex items-start justify-between p-4 rounded-xl border border-[#2a2a2c] bg-[#0f0f11] hover:border-border transition-colors cursor-pointer"
+                                >
+                                  <div className="flex items-start gap-3">
+                                    <div className={`w-[9px] h-[9px] rounded-full mt-1.5 shrink-0 ${dotColor}`}></div>
+                                    <div>
+                                      <h4 className="text-[15px] font-semibold text-gray-100">
+                                        {event.name} 
+                                        {event.edition && <span className="text-xs ml-2 bg-muted px-1.5 py-0.5 rounded text-muted-foreground font-normal">{event.edition}</span>}
+                                      </h4>
+                                      {event.description && (
+                                        <p className="text-[13px] text-gray-400 mt-1 max-w-2xl">{event.description}</p>
+                                      )}
+                                      <div className="flex flex-wrap items-center gap-3 mt-2.5">
+                                        <div className="flex items-center text-[12px] text-gray-400">
+                                          <Clock className="h-3.5 w-3.5 mr-1.5" />
+                                          {event.time}
+                                        </div>
+                                        {event.tags && event.tags.length > 0 && (
+                                          <div className="flex items-center gap-1.5">
+                                            {event.tags.map(tag => (
+                                              <span key={tag} className="text-[11px] px-2 py-0.5 rounded-full border border-[#2a2a2c] text-gray-300">
+                                                {tag}
+                                              </span>
+                                            ))}
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div className="shrink-0 ml-4 hidden sm:block">
+                                    <span className="text-[11px] px-2.5 py-1 rounded-full border border-[#2a2a2c] text-gray-300 font-medium capitalize">
+                                      {event.eventType || "Event"}
+                                    </span>
+                                  </div>
+                                </div>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      )
+                    })
+                  })()}
+                </div>
+              )}
             </div>
           )
         })}
