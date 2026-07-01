@@ -602,7 +602,7 @@ export default function DesignEventsCalendar() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={handleLogout}>Sign Out</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => signOut()}>Sign Out</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 ) : (
