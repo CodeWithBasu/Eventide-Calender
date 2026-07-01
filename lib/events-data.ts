@@ -9,7 +9,7 @@ export interface Event {
   month: string
   startDay: number
   endDay: number
-  eventType: "conference" | "workshop" | "meetup" | "festival" | "online"
+  eventType: string
   description?: string
   speakers?: string[]
   venue?: string

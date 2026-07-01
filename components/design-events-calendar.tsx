@@ -80,6 +80,7 @@ export default function DesignEventsCalendar() {
     location: "",
     eventType: "meetup" as any,
   })
+  const [customEventType, setCustomEventType] = useState("")
 
   const { toast } = useToast()
 
@@ -207,6 +208,7 @@ export default function DesignEventsCalendar() {
   const openAddEventDialog = (day: number, month: string) => {
     setAddEventDate({ day, month })
     setNewEvent({ name: "", time: "All Day", location: "", eventType: "meetup" })
+    setCustomEventType("")
     setAddEventDialogOpen(true)
   }
 
@@ -224,7 +226,7 @@ export default function DesignEventsCalendar() {
       month: addEventDate.month,
       startDay: addEventDate.day,
       endDay: addEventDate.day,
-      eventType: newEvent.eventType,
+      eventType: newEvent.eventType === "other" && customEventType.trim() !== "" ? customEventType : newEvent.eventType,
     }
 
     setLocalEvents([...localEvents, newlyCreatedEvent])
@@ -660,7 +662,20 @@ export default function DesignEventsCalendar() {
                     {type.charAt(0).toUpperCase() + type.slice(1)}
                   </option>
                 ))}
+                <option value="other">Other (Custom)</option>
               </select>
+
+              {newEvent.eventType === "other" && (
+                <div className="pt-2">
+                  <Input
+                    id="customEventType"
+                    required
+                    value={customEventType}
+                    onChange={(e) => setCustomEventType(e.target.value)}
+                    placeholder="e.g. Hackathon, Bootcamp..."
+                  />
+                </div>
+              )}
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setAddEventDialogOpen(false)}>Cancel</Button>
