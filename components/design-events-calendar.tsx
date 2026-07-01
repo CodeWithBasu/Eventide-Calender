@@ -75,12 +75,14 @@ export default function DesignEventsCalendar() {
   const [addEventDialogOpen, setAddEventDialogOpen] = useState(false)
   const [addEventDate, setAddEventDate] = useState<{ month: string; day: number } | null>(null)
   const [newEvent, setNewEvent] = useState({
-    name: "",
-    time: "",
-    location: "",
-    eventType: "meetup" as any,
+    title: "",
+    description: "",
+    startTime: "",
+    endTime: "",
+    category: "Meeting",
+    color: "Blue",
+    tags: [] as string[],
   })
-  const [customEventType, setCustomEventType] = useState("")
 
   const { toast } = useToast()
 
@@ -207,8 +209,15 @@ export default function DesignEventsCalendar() {
 
   const openAddEventDialog = (day: number, month: string) => {
     setAddEventDate({ day, month })
-    setNewEvent({ name: "", time: "All Day", location: "", eventType: "meetup" })
-    setCustomEventType("")
+    setNewEvent({ 
+      title: "", 
+      description: "", 
+      startTime: "", 
+      endTime: "", 
+      category: "Meeting", 
+      color: "Blue", 
+      tags: [] 
+    })
     setAddEventDialogOpen(true)
   }
 
@@ -216,24 +225,29 @@ export default function DesignEventsCalendar() {
     e.preventDefault()
     if (!addEventDate) return
 
+    const timeString = newEvent.startTime && newEvent.endTime 
+      ? `${newEvent.startTime.replace("T", " ")} - ${newEvent.endTime.replace("T", " ")}` 
+      : "All Day"
+
     const newlyCreatedEvent: Event = {
-      name: newEvent.name,
-      time: newEvent.time,
-      location: newEvent.location,
-      flag: "🌍", // Default flag
+      name: newEvent.title,
+      time: timeString,
+      location: "Custom",
+      flag: "🗓️", 
       url: "#",
-      continent: "Online", // Default
+      continent: "Online",
       month: addEventDate.month,
       startDay: addEventDate.day,
       endDay: addEventDate.day,
-      eventType: newEvent.eventType === "other" && customEventType.trim() !== "" ? customEventType : newEvent.eventType,
+      eventType: newEvent.category,
+      description: newEvent.description,
     }
 
     setLocalEvents([...localEvents, newlyCreatedEvent])
     setAddEventDialogOpen(false)
     toast({
       title: "Event Added",
-      description: `${newEvent.name} has been added to ${addEventDate.month} ${addEventDate.day}!`,
+      description: `${newEvent.title} has been added!`,
     })
   }
 
@@ -610,77 +624,146 @@ export default function DesignEventsCalendar() {
       </Dialog>
 
       <Dialog open={addEventDialogOpen} onOpenChange={setAddEventDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Add Event for {addEventDate?.month} {addEventDate?.day}</DialogTitle>
-            <DialogDescription>
-              Create a custom event for this day. It will appear on your calendar immediately.
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleAddEventSubmit} className="space-y-4">
+        <DialogContent className="sm:max-w-[450px] p-6 bg-[#0f0f11] border-[#2a2a2c] text-foreground">
+          <DialogTitle className="sr-only">Add Event</DialogTitle>
+          <form onSubmit={handleAddEventSubmit} className="space-y-5">
+            {/* Title */}
             <div className="space-y-2">
-              <Label htmlFor="eventName">Event Name</Label>
+              <Label className="text-[13px] font-semibold text-gray-200">Title</Label>
               <Input
-                id="eventName"
                 required
-                value={newEvent.name}
-                onChange={(e) => setNewEvent({ ...newEvent, name: e.target.value })}
-                placeholder="e.g. Design Meetup"
+                value={newEvent.title}
+                onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
+                placeholder="Event title"
+                className="bg-[#121214] border-[#2a2a2c] h-11"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="eventTime">Time</Label>
-              <Input
-                id="eventTime"
-                required
-                value={newEvent.time}
-                onChange={(e) => setNewEvent({ ...newEvent, time: e.target.value })}
-                placeholder="e.g. 6pm to 9pm"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="eventLocation">Location</Label>
-              <Input
-                id="eventLocation"
-                required
-                value={newEvent.location}
-                onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
-                placeholder="e.g. New York, Online"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="eventType">Event Type</Label>
-              <select
-                id="eventType"
-                required
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                value={newEvent.eventType}
-                onChange={(e) => setNewEvent({ ...newEvent, eventType: e.target.value as any })}
-              >
-                {eventTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {type.charAt(0).toUpperCase() + type.slice(1)}
-                  </option>
-                ))}
-                <option value="other">Other (Custom)</option>
-              </select>
 
-              {newEvent.eventType === "other" && (
-                <div className="pt-2">
+            {/* Description */}
+            <div className="space-y-2">
+              <Label className="text-[13px] font-semibold text-gray-200">Description</Label>
+              <textarea
+                value={newEvent.description}
+                onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
+                placeholder="Event description"
+                className="flex min-h-[90px] w-full rounded-md border border-[#2a2a2c] bg-[#121214] px-3 py-3 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
+              />
+            </div>
+
+            {/* Start / End Time */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-[13px] font-semibold text-gray-200">Start Time</Label>
+                <div className="relative">
                   <Input
-                    id="customEventType"
-                    required
-                    value={customEventType}
-                    onChange={(e) => setCustomEventType(e.target.value)}
-                    placeholder="e.g. Hackathon, Bootcamp..."
+                    type="datetime-local"
+                    value={newEvent.startTime}
+                    onChange={(e) => setNewEvent({ ...newEvent, startTime: e.target.value })}
+                    className="bg-[#121214] border-[#2a2a2c] h-11 w-full [color-scheme:dark] pr-3 text-sm"
                   />
                 </div>
-              )}
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[13px] font-semibold text-gray-200">End Time</Label>
+                <div className="relative">
+                  <Input
+                    type="datetime-local"
+                    value={newEvent.endTime}
+                    onChange={(e) => setNewEvent({ ...newEvent, endTime: e.target.value })}
+                    className="bg-[#121214] border-[#2a2a2c] h-11 w-full [color-scheme:dark] pr-3 text-sm"
+                  />
+                </div>
+              </div>
             </div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setAddEventDialogOpen(false)}>Cancel</Button>
-              <Button type="submit">Add Event</Button>
-            </DialogFooter>
+
+            {/* Category / Color */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-[13px] font-semibold text-gray-200">Category</Label>
+                <div className="relative">
+                  <select
+                    value={newEvent.category}
+                    onChange={(e) => setNewEvent({ ...newEvent, category: e.target.value })}
+                    className="flex h-11 w-full rounded-md border border-[#2a2a2c] bg-[#121214] px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring text-gray-200 appearance-none"
+                  >
+                    <option value="Meeting">Meeting</option>
+                    <option value="Conference">Conference</option>
+                    <option value="Workshop">Workshop</option>
+                    <option value="Personal">Personal</option>
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[13px] font-semibold text-gray-200">Color</Label>
+                <div className="relative flex items-center">
+                  <select
+                    value={newEvent.color}
+                    onChange={(e) => setNewEvent({ ...newEvent, color: e.target.value })}
+                    className="flex h-11 w-full rounded-md border border-[#2a2a2c] bg-[#121214] pl-10 pr-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring appearance-none text-gray-200"
+                  >
+                    <option value="Blue">Blue</option>
+                    <option value="Red">Red</option>
+                    <option value="Green">Green</option>
+                    <option value="Orange">Orange</option>
+                    <option value="Purple">Purple</option>
+                  </select>
+                  <div
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-[18px] h-[18px] rounded-[4px] pointer-events-none"
+                    style={{
+                      backgroundColor:
+                        newEvent.color === "Blue" ? "#3b82f6" :
+                        newEvent.color === "Red" ? "#ef4444" :
+                        newEvent.color === "Green" ? "#22c55e" :
+                        newEvent.color === "Orange" ? "#f97316" :
+                        "#a855f7",
+                    }}
+                  ></div>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                </div>
+              </div>
+            </div>
+
+            {/* Tags */}
+            <div className="space-y-2.5">
+              <Label className="text-[13px] font-semibold text-gray-200">Tags</Label>
+              <div className="flex flex-wrap gap-2">
+                {["Important", "Urgent", "Work", "Personal", "Team", "Client"].map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => {
+                      const tags = newEvent.tags.includes(tag)
+                        ? newEvent.tags.filter((t) => t !== tag)
+                        : [...newEvent.tags, tag]
+                      setNewEvent({ ...newEvent, tags })
+                    }}
+                    className={`px-3 py-1.5 rounded-full text-[12px] font-medium transition-colors ${
+                      newEvent.tags.includes(tag)
+                        ? "bg-white text-black"
+                        : "bg-transparent text-gray-300 border border-[#2a2a2c] hover:bg-[#1f1f22]"
+                    }`}
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Buttons */}
+            <div className="flex justify-end gap-3 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                className="bg-transparent border-[#2a2a2c] text-white hover:bg-[#1f1f22] hover:text-white"
+                onClick={() => setAddEventDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" className="bg-white text-black hover:bg-gray-200">
+                Create
+              </Button>
+            </div>
           </form>
         </DialogContent>
       </Dialog>
