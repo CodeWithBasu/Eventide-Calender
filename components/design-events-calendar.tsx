@@ -625,8 +625,13 @@ export default function DesignEventsCalendar() {
 
       <Dialog open={addEventDialogOpen} onOpenChange={setAddEventDialogOpen}>
         <DialogContent className="sm:max-w-[450px] p-6 bg-[#0f0f11] border-[#2a2a2c] text-foreground">
-          <DialogTitle className="sr-only">Add Event</DialogTitle>
-          <form onSubmit={handleAddEventSubmit} className="space-y-5">
+          <DialogHeader className="text-left">
+            <DialogTitle className="text-xl font-bold text-gray-100">Add Event for {addEventDate?.month} {addEventDate?.day}</DialogTitle>
+            <DialogDescription className="text-gray-400 text-sm mt-1.5">
+              Create a custom event for this day. It will appear on your calendar immediately.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleAddEventSubmit} className="space-y-5 pt-2">
             {/* Title */}
             <div className="space-y-2">
               <Label className="text-[13px] font-semibold text-gray-200">Title</Label>
