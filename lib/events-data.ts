@@ -10,6 +10,7 @@ export interface Event {
   startDay: number
   id?: string
   isCustom?: boolean
+  color?: string
   endDay: number
   eventType: string
   description?: string

@@ -242,7 +242,7 @@ export default function DesignEventsCalendar() {
       startTime,
       endTime,
       category: event.eventType || "Meeting",
-      color: "Blue",
+      color: event.color || "Blue",
       tags: [],
     })
     
@@ -272,6 +272,7 @@ export default function DesignEventsCalendar() {
       endDay: addEventDate.day,
       eventType: newEvent.category,
       description: newEvent.description,
+      color: newEvent.color,
     }
 
     if (editingEventId) {
@@ -896,7 +897,14 @@ export default function DesignEventsCalendar() {
                                   e.stopPropagation()
                                   handleEventClick(event)
                                 }}
-                                className="block text-xs p-2 border-l-2 border-primary bg-muted/50 hover:bg-muted transition-all hover:pl-3 hover:border-primary cursor-pointer group relative"
+                                className={`block text-xs p-2 border-l-2 bg-muted/50 hover:bg-muted transition-all hover:pl-3 cursor-pointer group relative ${
+                                  event.color === "Blue" ? "border-blue-500 hover:border-blue-500" :
+                                  event.color === "Red" ? "border-red-500 hover:border-red-500" :
+                                  event.color === "Green" ? "border-green-500 hover:border-green-500" :
+                                  event.color === "Orange" ? "border-orange-500 hover:border-orange-500" :
+                                  event.color === "Purple" ? "border-purple-500 hover:border-purple-500" :
+                                  "border-primary hover:border-primary"
+                                }`}
                               >
                                 <div className="font-medium leading-tight">{event.name}</div>
                                 {event.edition && (
