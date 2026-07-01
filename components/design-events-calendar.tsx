@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { SmoothInput } from "@/components/ui/smooth-input"
+import { ProgressiveBlur } from "@/components/ui/progressive-blur"
 import { ThemeToggleButton } from "./theme-toggle"
 import { useSession, signIn, signOut } from "next-auth/react"
 import { getEvents, addEvent, toggleSavedEvent, getSavedEvents, registerUser, updateEvent, deleteEvent } from "@/app/actions"
@@ -482,7 +483,8 @@ export default function DesignEventsCalendar() {
   const currentDay = today.getDate()
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground relative">
+      <ProgressiveBlur position="bottom" className="fixed bottom-0 z-40 pointer-events-none" height="100px" />
       <header className="sticky top-0 bg-background border-b border-border z-50">
         <div className="px-6 py-4 pb-0">
           <nav className="flex flex-col gap-4">
