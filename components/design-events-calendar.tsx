@@ -69,6 +69,18 @@ export default function DesignEventsCalendar() {
   const [authPassword, setAuthPassword] = useState("")
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
   const [eventDialogOpen, setEventDialogOpen] = useState(false)
+  
+  // Add Event State
+  const [localEvents, setLocalEvents] = useState<Event[]>(eventsData)
+  const [addEventDialogOpen, setAddEventDialogOpen] = useState(false)
+  const [addEventDate, setAddEventDate] = useState<{ month: string; day: number } | null>(null)
+  const [newEvent, setNewEvent] = useState({
+    name: "",
+    time: "",
+    location: "",
+    eventType: "meetup" as any,
+  })
+
   const { toast } = useToast()
 
   useEffect(() => {
@@ -192,6 +204,37 @@ export default function DesignEventsCalendar() {
     setShowOnlySaved(false)
   }
 
+  const openAddEventDialog = (day: number, month: string) => {
+    setAddEventDate({ day, month })
+    setNewEvent({ name: "", time: "All Day", location: "", eventType: "meetup" })
+    setAddEventDialogOpen(true)
+  }
+
+  const handleAddEventSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!addEventDate) return
+
+    const newlyCreatedEvent: Event = {
+      name: newEvent.name,
+      time: newEvent.time,
+      location: newEvent.location,
+      flag: "🌍", // Default flag
+      url: "#",
+      continent: "Online", // Default
+      month: addEventDate.month,
+      startDay: addEventDate.day,
+      endDay: addEventDate.day,
+      eventType: newEvent.eventType,
+    }
+
+    setLocalEvents([...localEvents, newlyCreatedEvent])
+    setAddEventDialogOpen(false)
+    toast({
+      title: "Event Added",
+      description: `${newEvent.name} has been added to ${addEventDate.month} ${addEventDate.day}!`,
+    })
+  }
+
   const toggleSaveEvent = (event: Event) => {
     if (!isLoggedIn) {
       setAuthDialogOpen(true)
@@ -231,7 +274,7 @@ export default function DesignEventsCalendar() {
     return `${startDate.toLocaleDateString("en-US", options)} - ${endDate.toLocaleDateString("en-US", options)}`
   }
 
-  const filteredEvents = eventsData.filter((event) => {
+  const filteredEvents = localEvents.filter((event) => {
     const matchesContinent = !selectedContinent || event.continent === selectedContinent
     const matchesEventType = !selectedEventType || event.eventType === selectedEventType
     const matchesSearch =
@@ -564,6 +607,69 @@ export default function DesignEventsCalendar() {
         </DialogContent>
       </Dialog>
 
+      <Dialog open={addEventDialogOpen} onOpenChange={setAddEventDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Add Event for {addEventDate?.month} {addEventDate?.day}</DialogTitle>
+            <DialogDescription>
+              Create a custom event for this day. It will appear on your calendar immediately.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleAddEventSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="eventName">Event Name</Label>
+              <Input
+                id="eventName"
+                required
+                value={newEvent.name}
+                onChange={(e) => setNewEvent({ ...newEvent, name: e.target.value })}
+                placeholder="e.g. Design Meetup"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="eventTime">Time</Label>
+              <Input
+                id="eventTime"
+                required
+                value={newEvent.time}
+                onChange={(e) => setNewEvent({ ...newEvent, time: e.target.value })}
+                placeholder="e.g. 6pm to 9pm"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="eventLocation">Location</Label>
+              <Input
+                id="eventLocation"
+                required
+                value={newEvent.location}
+                onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
+                placeholder="e.g. New York, Online"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="eventType">Event Type</Label>
+              <select
+                id="eventType"
+                required
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                value={newEvent.eventType}
+                onChange={(e) => setNewEvent({ ...newEvent, eventType: e.target.value as any })}
+              >
+                {eventTypes.map((type) => (
+                  <option key={type} value={type}>
+                    {type.charAt(0).toUpperCase() + type.slice(1)}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setAddEventDialogOpen(false)}>Cancel</Button>
+              <Button type="submit">Add Event</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
       <main className="px-6 py-8">
         {months.map((month) => {
           const generateMonthCalendar = (month: string) => {
@@ -614,7 +720,7 @@ export default function DesignEventsCalendar() {
                   <div
                     key={index}
                     onClick={() => {
-                      if (day.date) setAuthDialogOpen(true)
+                      if (day.date) openAddEventDialog(day.date, month)
                     }}
                     className={`bg-background p-2 min-h-[120px] transition-colors hover:bg-accent/50 ${day.date ? "cursor-pointer" : ""} ${
                       isToday(day.date) ? "ring-2 ring-inset ring-primary" : ""
