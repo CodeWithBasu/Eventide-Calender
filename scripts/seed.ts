@@ -9,16 +9,16 @@ async function main() {
     await prisma.event.create({
       data: {
         name: event.name,
-        date: event.date,
+        date: `${event.month} ${event.startDay}${event.endDay && event.endDay !== event.startDay ? ` - ${event.endDay}` : ""}`,
         startDay: event.startDay,
-        endDay: event.endDay,
+        endDay: event.endDay || event.startDay,
         location: event.location,
-        flag: event.flag,
-        category: event.category,
-        color: event.color,
-        url: event.url,
-        time: event.time,
-        edition: event.edition,
+        flag: event.flag || "",
+        category: event.eventType || "Event",
+        color: event.color || "blue",
+        url: event.url || "",
+        time: event.time || "",
+        edition: event.edition || "",
         tags: event.tags?.join(",") || ""
       }
     });

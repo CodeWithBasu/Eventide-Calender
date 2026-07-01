@@ -71,6 +71,7 @@ export default function DesignEventsCalendar() {
   const [authMode, setAuthMode] = useState<"signin" | "signup">("signin")
   const [authEmail, setAuthEmail] = useState("")
   const [authPassword, setAuthPassword] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
   const [eventDialogOpen, setEventDialogOpen] = useState(false)
   
@@ -176,6 +177,42 @@ export default function DesignEventsCalendar() {
     setAuthDialogOpen(false)
     setAuthEmail("")
     setAuthPassword("")
+  }
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+    try {
+      const result = await signIn("credentials", {
+        redirect: false,
+        email: authEmail,
+        password: authPassword,
+      })
+
+      if (result?.error) {
+        toast({
+          title: "Authentication Failed",
+          description: result.error,
+          variant: "destructive",
+        })
+      } else {
+        toast({
+          title: "Success",
+          description: "You have been successfully signed in.",
+        })
+        setAuthDialogOpen(false)
+        setAuthEmail("")
+        setAuthPassword("")
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleAuthSubmit = (e: React.FormEvent) => {
