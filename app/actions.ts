@@ -55,7 +55,8 @@ export async function addEvent(data: any) {
         color: data.color,
         url: "#",
         time: `${data.startTime} - ${data.endTime}`,
-        tags: data.tags?.join(",") || ""
+        tags: data.tags?.join(",") || "",
+        description: data.description
       }
     });
     revalidatePath("/");
@@ -63,6 +64,42 @@ export async function addEvent(data: any) {
   } catch (error) {
     console.error("Failed to add event:", error);
     return { success: false, error: "Failed to add event" };
+  }
+}
+
+export async function updateEvent(id: string, data: any) {
+  try {
+    const event = await prisma.event.update({
+      where: { id },
+      data: {
+        name: data.title,
+        date: `${data.month} ${data.startDay}${data.endDay && data.endDay !== data.startDay ? ` - ${data.endDay}` : ""}`,
+        month: data.month,
+        startDay: data.startDay,
+        endDay: data.endDay,
+        category: data.category,
+        color: data.color,
+        time: `${data.startTime} - ${data.endTime}`,
+        tags: data.tags?.join(",") || "",
+        description: data.description
+      }
+    });
+    revalidatePath("/");
+    return { success: true, event };
+  } catch (error) {
+    console.error("Failed to update event:", error);
+    return { success: false, error: "Failed to update event" };
+  }
+}
+
+export async function deleteEvent(id: string) {
+  try {
+    await prisma.event.delete({ where: { id } });
+    revalidatePath("/");
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to delete event:", error);
+    return { success: false, error: "Failed to delete event" };
   }
 }
 

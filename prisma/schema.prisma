@@ -20,7 +20,9 @@ model User {
 model Event {
   id          String       @id @default(cuid())
   name        String
+  description String?
   date        String       // e.g., "August 18 - August 22"
+  month       String?
   startDay    Int
   endDay      Int
   location    String       // e.g., "Seattle, WA"

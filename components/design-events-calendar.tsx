@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input"
 import { SmoothInput } from "@/components/ui/smooth-input"
 import { ThemeToggleButton } from "./theme-toggle"
 import { useSession, signIn, signOut } from "next-auth/react"
-import { getEvents, addEvent, toggleSavedEvent, getSavedEvents, registerUser } from "@/app/actions"
+import { getEvents, addEvent, toggleSavedEvent, getSavedEvents, registerUser, updateEvent, deleteEvent } from "@/app/actions"
 import { Label } from "@/components/ui/label"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import {
@@ -83,6 +83,15 @@ export default function DesignEventsCalendar() {
   const [editingEventId, setEditingEventId] = useState<string | null>(null)
   const [addEventDate, setAddEventDate] = useState<{ month: string; day: number } | null>(null)
   const [newEvent, setNewEvent] = useState({
+    title: "",
+    description: "",
+    startTime: "",
+    endTime: "",
+    category: "Meeting",
+    color: "Blue",
+    tags: [] as string[],
+  })
+  const [editEventData, setEditEventData] = useState({
     title: "",
     description: "",
     startTime: "",
@@ -260,6 +269,42 @@ export default function DesignEventsCalendar() {
     }
   }
 
+  const handleUpdateEventSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!selectedEvent?.id) return
+    setIsLoading(true)
+    const result = await updateEvent(selectedEvent.id, {
+      ...editEventData,
+      month: selectedEvent.month,
+      startDay: selectedEvent.startDay,
+      endDay: selectedEvent.endDay,
+    })
+    setIsLoading(false)
+    
+    if (result.success) {
+      toast({ title: "Event Updated", description: "Your event was successfully updated." })
+      setEventDialogOpen(false)
+      getEvents().then((data) => { if (data.length > 0) setLocalEvents(data as any) })
+    } else {
+      toast({ title: "Error", description: result.error || "Failed to update event.", variant: "destructive" })
+    }
+  }
+
+  const handleDeleteEvent = async () => {
+    if (!selectedEvent?.id) return
+    setIsLoading(true)
+    const result = await deleteEvent(selectedEvent.id)
+    setIsLoading(false)
+    
+    if (result.success) {
+      toast({ title: "Event Deleted", description: "Your event was successfully deleted." })
+      setEventDialogOpen(false)
+      getEvents().then((data) => { if (data.length > 0) setLocalEvents(data as any) })
+    } else {
+      toast({ title: "Error", description: result.error || "Failed to delete event.", variant: "destructive" })
+    }
+  }
+
   const openAddEventDialog = (day: number, month: string) => {
     setEditingEventId(null)
     setAddEventDate({ day, month })
@@ -383,6 +428,26 @@ export default function DesignEventsCalendar() {
 
   const handleEventClick = (event: Event) => {
     setSelectedEvent(event)
+    
+    let st = "", et = ""
+    try {
+      const parts = event.time.split(" - ")
+      if (parts.length === 2) {
+        st = parts[0]
+        et = parts[1]
+      }
+    } catch(e) {}
+    
+    setEditEventData({
+      title: event.name || "",
+      description: event.description || "",
+      startTime: st,
+      endTime: et,
+      category: event.category || "Meeting",
+      color: event.color || "Blue",
+      tags: Array.isArray(event.tags) ? event.tags : (event.tags ? (event.tags as string).split(",") : [])
+    })
+
     setEventDialogOpen(true)
   }
 
@@ -651,101 +716,159 @@ export default function DesignEventsCalendar() {
       </header>
 
       <Dialog open={eventDialogOpen} onOpenChange={setEventDialogOpen}>
-        <DialogContent className="sm:max-w-[550px]">
+        <DialogContent className="sm:max-w-[450px] p-6 bg-[#0f0f11] border-[#2a2a2c] text-foreground">
           {selectedEvent && (
             <>
-              <DialogHeader>
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <DialogTitle className="text-2xl">{selectedEvent.name}</DialogTitle>
-                    {selectedEvent.edition && (
-                      <span className="inline-block mt-1 text-xs bg-muted px-2 py-0.5 rounded">
-                        {selectedEvent.edition}
-                      </span>
-                    )}
-                  </div>
-                  <span className="inline-block text-xs bg-primary/10 text-primary px-2 py-1 rounded capitalize">
-                    {selectedEvent.eventType}
-                  </span>
-                </div>
+              <DialogHeader className="text-left">
+                <DialogTitle className="text-xl font-bold text-gray-100">Event Details</DialogTitle>
+                <DialogDescription className="text-gray-400 text-sm mt-1.5">
+                  View and edit event details
+                </DialogDescription>
               </DialogHeader>
+              <form onSubmit={handleUpdateEventSubmit} className="space-y-5 pt-2">
+                {/* Title */}
+                <div className="space-y-2">
+                  <Label className="text-[13px] font-semibold text-gray-200">Title</Label>
+                  <SmoothInput
+                    required
+                    type="text"
+                    value={editEventData.title}
+                    onChange={(e) => setEditEventData({ ...editEventData, title: e.target.value })}
+                    wrapperClassName="border border-[#2a2a2c] rounded-md"
+                  />
+                </div>
 
-              <div className="space-y-4 py-4">
-                <div className="flex items-center gap-3 text-sm">
-                  <Clock className="h-4 w-4 text-muted-foreground shrink-0" />
-                  <div>
-                    <p className="font-medium">{formatDateRange(selectedEvent)}, 2026</p>
-                    <p className="text-muted-foreground">{selectedEvent.time}</p>
+                {/* Description */}
+                <div className="space-y-2">
+                  <Label className="text-[13px] font-semibold text-gray-200">Description</Label>
+                  <textarea
+                    value={editEventData.description}
+                    onChange={(e) => setEditEventData({ ...editEventData, description: e.target.value })}
+                    className="flex min-h-[90px] w-full rounded-md border border-[#2a2a2c] bg-[#121214] px-3 py-3 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
+                  />
+                </div>
+
+                {/* Start Time and End Time */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-[13px] font-semibold text-gray-200">Start Time</Label>
+                    <Input
+                      type="datetime-local"
+                      value={editEventData.startTime}
+                      onChange={(e) => setEditEventData({ ...editEventData, startTime: e.target.value })}
+                      className="bg-[#121214] border-[#2a2a2c] h-11 w-full [color-scheme:dark] pr-3 text-sm"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[13px] font-semibold text-gray-200">End Time</Label>
+                    <Input
+                      type="datetime-local"
+                      value={editEventData.endTime}
+                      onChange={(e) => setEditEventData({ ...editEventData, endTime: e.target.value })}
+                      className="bg-[#121214] border-[#2a2a2c] h-11 w-full [color-scheme:dark] pr-3 text-sm"
+                    />
                   </div>
                 </div>
 
-              {selectedEvent.location && (
-                <div className="flex items-center gap-3 text-sm">
-                  <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
-                  <div>
-                    <p className="font-medium">
-                      {selectedEvent.location} {selectedEvent.flag}
-                    </p>
-                    {selectedEvent.venue && <p className="text-muted-foreground">{selectedEvent.venue}</p>}
-                  </div>
-                </div>
-              )}
-
-                {selectedEvent.speakers && selectedEvent.speakers.length > 0 && (
-                  <div className="flex items-center gap-3 text-sm">
-                    <Users className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
-                    <div>
-                      <p className="font-medium">Speakers</p>
-                      <p className="text-muted-foreground">{selectedEvent.speakers.join(", ")}</p>
+                {/* Category and Color */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-[13px] font-semibold text-gray-200">Category</Label>
+                    <div className="relative">
+                      <select
+                        value={editEventData.category}
+                        onChange={(e) => setEditEventData({ ...editEventData, category: e.target.value })}
+                        className="w-full bg-[#121214] border border-[#2a2a2c] text-sm rounded-md h-11 px-3 appearance-none focus:outline-none focus:ring-1 focus:ring-ring"
+                      >
+                        {eventTypes.map(t => <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>)}
+                        <option value="Meeting">Meeting</option>
+                        <option value="Personal">Personal</option>
+                        <option value="Task">Task</option>
+                      </select>
+                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                     </div>
                   </div>
-                )}
-
-                {selectedEvent.description && (
-                  <div className="pt-2 border-t border-border">
-                    <p className="text-sm text-muted-foreground leading-relaxed">{selectedEvent.description}</p>
+                  <div className="space-y-2">
+                    <Label className="text-[13px] font-semibold text-gray-200">Color</Label>
+                    <div className="relative">
+                      <select
+                        value={editEventData.color}
+                        onChange={(e) => setEditEventData({ ...editEventData, color: e.target.value })}
+                        className="w-full bg-[#121214] border border-[#2a2a2c] text-sm rounded-md h-11 pl-9 pr-3 appearance-none focus:outline-none focus:ring-1 focus:ring-ring"
+                      >
+                        <option value="Blue">Blue</option>
+                        <option value="Red">Red</option>
+                        <option value="Green">Green</option>
+                        <option value="Orange">Orange</option>
+                        <option value="Purple">Purple</option>
+                      </select>
+                      <div
+                        className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full"
+                        style={{
+                          backgroundColor:
+                            editEventData.color === "Blue" ? "#3b82f6" :
+                            editEventData.color === "Red" ? "#ef4444" :
+                            editEventData.color === "Green" ? "#22c55e" :
+                            editEventData.color === "Orange" ? "#f97316" :
+                            "#a855f7",
+                        }}
+                      ></div>
+                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                    </div>
                   </div>
-                )}
-              </div>
+                </div>
 
-              <DialogFooter className="flex-col sm:flex-row gap-2">
-                <Button
-                  variant="outline"
-                  className="flex-1 bg-transparent"
-                  onClick={() => handleAddToCalendar(selectedEvent, selectedEvent.month)}
-                >
-                  <CalendarPlus className="h-4 w-4 mr-2" />
-                  Add to Calendar
-                </Button>
-                {session && (
+                {/* Tags */}
+                <div className="space-y-2.5">
+                  <Label className="text-[13px] font-semibold text-gray-200">Tags</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {["Important", "Urgent", "Work", "Personal", "Team", "Client"].map((tag) => (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => {
+                          const tags = editEventData.tags.includes(tag)
+                            ? editEventData.tags.filter((t) => t !== tag)
+                            : [...editEventData.tags, tag]
+                          setEditEventData({ ...editEventData, tags })
+                        }}
+                        className={`px-3 py-1.5 rounded-full text-[12px] font-medium transition-colors ${
+                          editEventData.tags.includes(tag)
+                            ? "bg-white text-black"
+                            : "bg-transparent text-gray-300 border border-[#2a2a2c] hover:bg-[#1f1f22]"
+                        }`}
+                      >
+                        {tag}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Buttons */}
+                <div className="flex justify-end gap-3 pt-4">
                   <Button
-                    variant="outline"
-                    className="flex-1 bg-transparent"
-                    onClick={() => toggleSaveEvent(selectedEvent)}
+                    type="button"
+                    variant="destructive"
+                    className="bg-[#ff4d4d] hover:bg-[#ff3333] text-white font-medium"
+                    onClick={handleDeleteEvent}
+                    disabled={isLoading}
                   >
-                    <Heart
-                      className={`h-4 w-4 mr-2 ${isEventSaved(selectedEvent) ? "fill-current text-red-500" : ""}`}
-                    />
-                    {isEventSaved(selectedEvent) ? "Saved" : "Save Event"}
+                    Delete
                   </Button>
-                )}
-                {selectedEvent.isCustom && (
                   <Button
+                    type="button"
                     variant="outline"
-                    className="flex-1 bg-transparent"
-                    onClick={() => handleEditEvent(selectedEvent)}
+                    className="bg-transparent border-[#2a2a2c] text-white hover:bg-[#1f1f22] hover:text-white font-medium"
+                    onClick={() => setEventDialogOpen(false)}
+                    disabled={isLoading}
                   >
-                    <Edit className="h-4 w-4 mr-2" />
-                    Edit
+                    Cancel
                   </Button>
-                )}
-                <Button asChild className="flex-1">
-                  <a href={selectedEvent.url} target="_blank" rel="noopener noreferrer">
-                    Visit Website
-                    <ExternalLink className="h-4 w-4 ml-2" />
-                  </a>
-                </Button>
-              </DialogFooter>
+                  <Button type="submit" className="bg-white text-black hover:bg-gray-200 font-medium" disabled={isLoading}>
+                    Save
+                  </Button>
+                </div>
+              </form>
             </>
           )}
         </DialogContent>
