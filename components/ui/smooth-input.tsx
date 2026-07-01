@@ -282,7 +282,7 @@ const SmoothInput = React.forwardRef<HTMLInputElement, SmoothInputProps>(({
           className="pointer-events-none invisible absolute top-0 left-0 whitespace-pre"
         />
         <motion.div
-          className="bg-primary pointer-events-none col-start-1 col-end-2 row-start-1 row-end-2 h-[0.9em] w-[2px] self-center ml-3"
+          className="bg-primary pointer-events-none col-start-1 col-end-2 row-start-1 row-end-2 h-[0.9em] w-[2px] self-center justify-self-start"
           style={{ x: springCaretX, opacity: caretOpacity }}
         />
       </div>
