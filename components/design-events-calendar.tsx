@@ -613,7 +613,10 @@ export default function DesignEventsCalendar() {
                 {monthData.map((day, index) => (
                   <div
                     key={index}
-                    className={`bg-background p-2 min-h-[120px] transition-colors hover:bg-accent/50 ${
+                    onClick={() => {
+                      if (day.date) setAuthDialogOpen(true)
+                    }}
+                    className={`bg-background p-2 min-h-[120px] transition-colors hover:bg-accent/50 ${day.date ? "cursor-pointer" : ""} ${
                       isToday(day.date) ? "ring-2 ring-inset ring-primary" : ""
                     }`}
                   >
@@ -630,7 +633,10 @@ export default function DesignEventsCalendar() {
                             return (
                               <div
                                 key={eventIndex}
-                                onClick={() => handleEventClick(event)}
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleEventClick(event)
+                                }}
                                 className="block text-xs p-2 border-l-2 border-primary bg-muted/50 hover:bg-muted transition-all hover:pl-3 hover:border-primary cursor-pointer group relative"
                               >
                                 <div className="font-medium leading-tight">{event.name}</div>
