@@ -897,16 +897,23 @@ export default function DesignEventsCalendar() {
                                   e.stopPropagation()
                                   handleEventClick(event)
                                 }}
-                                className={`block text-xs p-2 border-l-2 bg-muted/50 hover:bg-muted transition-all hover:pl-3 cursor-pointer group relative ${
-                                  event.color === "Blue" ? "border-blue-500 hover:border-blue-500" :
-                                  event.color === "Red" ? "border-red-500 hover:border-red-500" :
-                                  event.color === "Green" ? "border-green-500 hover:border-green-500" :
-                                  event.color === "Orange" ? "border-orange-500 hover:border-orange-500" :
-                                  event.color === "Purple" ? "border-purple-500 hover:border-purple-500" :
-                                  "border-primary hover:border-primary"
+                                className={`block text-xs p-2.5 border-l-[3px] rounded-r-md transition-all hover:pl-3.5 cursor-pointer group relative shadow-sm ${
+                                  event.color === "Blue" ? "border-blue-500 bg-blue-500/10 hover:bg-blue-500/20" :
+                                  event.color === "Red" ? "border-red-500 bg-red-500/10 hover:bg-red-500/20" :
+                                  event.color === "Green" ? "border-green-500 bg-green-500/10 hover:bg-green-500/20" :
+                                  event.color === "Orange" ? "border-orange-500 bg-orange-500/10 hover:bg-orange-500/20" :
+                                  event.color === "Purple" ? "border-purple-500 bg-purple-500/10 hover:bg-purple-500/20" :
+                                  "border-primary bg-primary/5 hover:bg-primary/10"
                                 }`}
                               >
-                                <div className="font-medium leading-tight">{event.name}</div>
+                                <div className={`font-semibold leading-tight mb-0.5 ${
+                                  event.color === "Blue" ? "text-blue-400" :
+                                  event.color === "Red" ? "text-red-400" :
+                                  event.color === "Green" ? "text-green-400" :
+                                  event.color === "Orange" ? "text-orange-400" :
+                                  event.color === "Purple" ? "text-purple-400" :
+                                  "text-foreground"
+                                }`}>{event.name}</div>
                                 {event.edition && (
                                   <span className="inline-block mt-1 text-[10px] bg-background px-1 py-0.5 rounded">
                                     {event.edition}
