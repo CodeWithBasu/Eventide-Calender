@@ -414,7 +414,7 @@ export default function DesignEventsCalendar() {
               </div>
               {/* Dark mode toggle */}
               <div className="flex items-center gap-2">
-                <ThemeToggleButton variant="circle-blur" start="top-right" />
+                <ThemeToggleButton variant="polygon" start="top-left" blur={true} />
               </div>
             </div>
 
