@@ -532,6 +532,7 @@ export default function DesignEventsCalendar() {
                   </SheetTrigger>
                   <SheetContent side="left" className="w-[85vw] max-w-[400px] p-0 bg-[#1c1c1e] border-none text-gray-200 rounded-r-2xl sm:rounded-r-3xl overflow-y-auto">
                     <SheetHeader className="p-4 border-b border-[#2c2c2e]/50 flex flex-row items-center justify-between space-y-0 text-left">
+                      <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
                       <Button variant="ghost" size="icon" className="hover:bg-[#2c2c2e] -ml-2" onClick={() => setIsMobileSheetOpen(false)}>
                         <Menu className="h-6 w-6 text-gray-300" />
                       </Button>
