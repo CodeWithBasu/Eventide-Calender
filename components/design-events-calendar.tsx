@@ -1328,10 +1328,7 @@ export default function DesignEventsCalendar() {
                                   <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                     {session && (
                                       <button
-                                        onClick={(e) => {
-                                          e.stopPropagation()
-                                          toggleSaveEvent(event)
-                                        }}
+                                        onClick={(e) => handleSaveEvent(e, event.id)}
                                         className={`p-1 hover:bg-background rounded ${isSaved ? "opacity-100" : ""}`}
                                         title={isSaved ? "Remove from saved" : "Save event"}
                                       >
