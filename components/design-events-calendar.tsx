@@ -955,17 +955,18 @@ export default function DesignEventsCalendar() {
                                   )}
 
                                   <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation()
-                                        toggleSaveEvent(event)
-                                      }}
-                                      className={`p-1 hover:bg-background rounded ${isSaved ? "opacity-100" : ""}`}
-                                      title={isSaved ? "Remove from saved" : "Save event"}
-                                    >
-                                      <Heart className={`h-3 w-3 ${isSaved ? "fill-current text-red-500" : ""}`} />
-                                    </button>
-                                  )}
+                                    {isLoggedIn && (
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation()
+                                          toggleSaveEvent(event)
+                                        }}
+                                        className={`p-1 hover:bg-background rounded ${isSaved ? "opacity-100" : ""}`}
+                                        title={isSaved ? "Remove from saved" : "Save event"}
+                                      >
+                                        <Heart className={`h-3 w-3 ${isSaved ? "fill-current text-red-500" : ""}`} />
+                                      </button>
+                                    )}
                                 </div>
                               </div>
                             )
