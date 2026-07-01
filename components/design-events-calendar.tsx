@@ -234,7 +234,12 @@ export default function DesignEventsCalendar() {
   const handleAddEventSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    const result = await addEvent(newEvent)
+    const result = await addEvent({
+      ...newEvent,
+      month: addEventDate?.month,
+      startDay: addEventDate?.day,
+      endDay: addEventDate?.day,
+    })
     setIsLoading(false)
     
     if (result.success) {

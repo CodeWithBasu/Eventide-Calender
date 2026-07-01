@@ -45,16 +45,17 @@ export async function addEvent(data: any) {
     const event = await prisma.event.create({
       data: {
         name: data.title,
-        date: "TBD", // Simplification
-        startDay: 1, // Need to parse from actual data
-        endDay: 1,
+        date: `${data.month} ${data.startDay}${data.endDay && data.endDay !== data.startDay ? ` - ${data.endDay}` : ""}`,
+        month: data.month,
+        startDay: data.startDay || 1,
+        endDay: data.endDay || data.startDay || 1,
         location: "Online",
         flag: "🌍",
         category: data.category,
         color: data.color,
         url: "#",
         time: `${data.startTime} - ${data.endTime}`,
-        tags: data.tags.join(",")
+        tags: data.tags?.join(",") || ""
       }
     });
     revalidatePath("/");
