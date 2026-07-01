@@ -8,6 +8,8 @@ export interface Event {
   continent: string
   month: string
   startDay: number
+  id?: string
+  isCustom?: boolean
   endDay: number
   eventType: string
   description?: string

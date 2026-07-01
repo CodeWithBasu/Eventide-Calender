@@ -33,6 +33,7 @@ import {
   ExternalLink,
   Users,
   FileDown,
+  Edit,
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
@@ -73,6 +74,7 @@ export default function DesignEventsCalendar() {
   // Add Event State
   const [localEvents, setLocalEvents] = useState<Event[]>(eventsData)
   const [addEventDialogOpen, setAddEventDialogOpen] = useState(false)
+  const [editingEventId, setEditingEventId] = useState<string | null>(null)
   const [addEventDate, setAddEventDate] = useState<{ month: string; day: number } | null>(null)
   const [newEvent, setNewEvent] = useState({
     title: "",
@@ -208,6 +210,7 @@ export default function DesignEventsCalendar() {
   }
 
   const openAddEventDialog = (day: number, month: string) => {
+    setEditingEventId(null)
     setAddEventDate({ day, month })
     setNewEvent({ 
       title: "", 
@@ -221,6 +224,32 @@ export default function DesignEventsCalendar() {
     setAddEventDialogOpen(true)
   }
 
+  const handleEditEvent = (event: Event) => {
+    setEditingEventId(event.id || null)
+    setAddEventDate({ month: event.month, day: event.startDay })
+    
+    let startTime = ""
+    let endTime = ""
+    if (event.time && event.time.includes(" - ")) {
+      const parts = event.time.split(" - ")
+      startTime = parts[0].replace(" ", "T")
+      endTime = parts[1].replace(" ", "T")
+    }
+
+    setNewEvent({
+      title: event.name,
+      description: event.description || "",
+      startTime,
+      endTime,
+      category: event.eventType || "Meeting",
+      color: "Blue",
+      tags: [],
+    })
+    
+    setEventDialogOpen(false)
+    setAddEventDialogOpen(true)
+  }
+
   const handleAddEventSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!addEventDate) return
@@ -230,6 +259,8 @@ export default function DesignEventsCalendar() {
       : "All Day"
 
     const newlyCreatedEvent: Event = {
+      id: editingEventId || Date.now().toString(),
+      isCustom: true,
       name: newEvent.title,
       time: timeString,
       location: "Custom",
@@ -243,12 +274,21 @@ export default function DesignEventsCalendar() {
       description: newEvent.description,
     }
 
-    setLocalEvents([...localEvents, newlyCreatedEvent])
+    if (editingEventId) {
+      setLocalEvents(localEvents.map(evt => evt.id === editingEventId ? newlyCreatedEvent : evt))
+      toast({
+        title: "Event Updated",
+        description: `${newEvent.title} has been updated!`,
+      })
+    } else {
+      setLocalEvents([...localEvents, newlyCreatedEvent])
+      toast({
+        title: "Event Added",
+        description: `${newEvent.title} has been added!`,
+      })
+    }
+
     setAddEventDialogOpen(false)
-    toast({
-      title: "Event Added",
-      description: `${newEvent.title} has been added!`,
-    })
   }
 
   const toggleSaveEvent = (event: Event) => {
@@ -609,6 +649,16 @@ export default function DesignEventsCalendar() {
                       className={`h-4 w-4 mr-2 ${isEventSaved(selectedEvent) ? "fill-current text-red-500" : ""}`}
                     />
                     {isEventSaved(selectedEvent) ? "Saved" : "Save Event"}
+                  </Button>
+                )}
+                {selectedEvent.isCustom && (
+                  <Button
+                    variant="outline"
+                    className="flex-1 bg-transparent"
+                    onClick={() => handleEditEvent(selectedEvent)}
+                  >
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit
                   </Button>
                 )}
                 <Button asChild className="flex-1">
