@@ -715,12 +715,13 @@ export default function DesignEventsCalendar() {
             </div>
           </nav>
 
-          <div className="flex mt-4">
-            <div className="w-[180px] shrink-0" />
+          <div className="flex mt-4 -mx-6 px-6 lg:mx-0 lg:px-0">
+            <div className="hidden lg:block w-[180px] shrink-0" />
             <div className="flex-1 grid grid-cols-7 border-border border-b-0">
               {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => (
-                <div key={day} className="bg-background p-2 text-center font-medium text-sm">
-                  {day}
+                <div key={day} className="bg-background p-1 sm:p-2 text-center font-medium text-[10px] sm:text-sm">
+                  <span className="hidden sm:inline">{day}</span>
+                  <span className="sm:hidden">{day.slice(0, 3)}</span>
                 </div>
               ))}
             </div>
