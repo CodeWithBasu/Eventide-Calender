@@ -215,22 +215,30 @@ export default function DesignEventsCalendar() {
     }
   }
 
-  const handleAuthSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Demo: just store email in localStorage
-    localStorage.setItem("demoUser", authEmail)
-    setIsLoggedIn(true)
-    setUserEmail(authEmail)
-    setAuthDialogOpen(false)
-    setAuthEmail("")
-    setAuthPassword("")
-  }
 
-  const handleSignOut = () => {
-    localStorage.removeItem("demoUser")
-    setIsLoggedIn(false)
-    setUserEmail("")
-    setShowOnlySaved(false)
+
+  const handleAddEventSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+    const result = await addEvent(newEvent)
+    setIsLoading(false)
+    
+    if (result.success) {
+      toast({
+        title: "Event Added",
+        description: "Your event was successfully added.",
+      })
+      setAddEventDialogOpen(false)
+      getEvents().then((data) => {
+        if (data.length > 0) setLocalEvents(data as any)
+      })
+    } else {
+      toast({
+        title: "Error",
+        description: result.error || "Failed to add event.",
+        variant: "destructive",
+      })
+    }
   }
 
   const openAddEventDialog = (day: number, month: string) => {
