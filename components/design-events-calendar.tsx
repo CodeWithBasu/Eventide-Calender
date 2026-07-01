@@ -25,6 +25,13 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
+import {
   Sun,
   Moon,
   ChevronDown,
@@ -42,6 +49,14 @@ import {
   Menu,
   List as ListIcon,
   LayoutGrid,
+  Settings,
+  CheckCircle2,
+  Filter,
+  Globe,
+  Tag,
+  LogOut,
+  ChevronRight,
+  Calendar as CalendarIcon
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
@@ -105,7 +120,7 @@ export default function DesignEventsCalendar() {
 
   const { toast } = useToast()
 
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isMobileSheetOpen, setIsMobileSheetOpen] = useState(false)
 
   useEffect(() => {
     getEvents().then((data) => {
@@ -504,18 +519,182 @@ export default function DesignEventsCalendar() {
               {/* Dark mode toggle and Mobile Menu */}
               <div className="flex items-center gap-2">
                 <ThemeToggleButton variant="polygon" start="top-left" blur={true} />
-                <Button 
-                  variant="outline" 
-                  size="icon" 
-                  className="lg:hidden" 
-                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                >
-                  <Menu className="h-5 w-5" />
-                </Button>
+                
+                <Sheet open={isMobileSheetOpen} onOpenChange={setIsMobileSheetOpen}>
+                  <SheetTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      className="lg:hidden" 
+                    >
+                      <Menu className="h-5 w-5" />
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="left" className="w-[85vw] max-w-[400px] p-0 bg-[#1c1c1e] border-none text-gray-200 rounded-r-2xl sm:rounded-r-3xl overflow-y-auto">
+                    <SheetHeader className="p-4 border-b border-[#2c2c2e]/50 flex flex-row items-center justify-between space-y-0 text-left">
+                      <Button variant="ghost" size="icon" className="hover:bg-[#2c2c2e] -ml-2" onClick={() => setIsMobileSheetOpen(false)}>
+                        <Menu className="h-6 w-6 text-gray-300" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="hover:bg-[#2c2c2e] -mr-2">
+                        <Settings className="h-5 w-5 text-gray-400" />
+                      </Button>
+                    </SheetHeader>
+
+                    <div className="py-2">
+                      {/* Views */}
+                      <div className="px-4 py-2">
+                        <button onClick={() => { setViewMode("calendar"); setIsMobileSheetOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-[#2c2c2e] transition-colors">
+                          <div className="flex items-center gap-4">
+                            <CalendarIcon className="h-5 w-5 text-gray-400" />
+                            <span className="text-lg">Calendar</span>
+                          </div>
+                          {viewMode === "calendar" && <CheckCircle2 className="h-5 w-5 text-blue-500" />}
+                        </button>
+                        <button onClick={() => { setViewMode("list"); setIsMobileSheetOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-[#2c2c2e] transition-colors mt-1">
+                          <div className="flex items-center gap-4">
+                            <ListIcon className="h-5 w-5 text-gray-400" />
+                            <span className="text-lg">List</span>
+                          </div>
+                          {viewMode === "list" && <CheckCircle2 className="h-5 w-5 text-blue-500" />}
+                        </button>
+                      </div>
+
+                      <div className="h-px bg-[#2c2c2e]/50 my-2 border-t border-dashed border-[#444]/30 mx-4" />
+
+                      {/* Filters / Selectors */}
+                      <div className="px-4 py-2">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-[#2c2c2e] transition-colors">
+                              <div className="flex items-center gap-4">
+                                <Filter className="h-5 w-5 text-gray-400" />
+                                <span className="text-lg">Month</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                                <span>{months[0]}</span>
+                                <ChevronDown className="h-4 w-4" />
+                              </div>
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-[200px] bg-[#2c2c2e] border-none text-gray-200">
+                            {months.map((m) => (
+                              <DropdownMenuItem key={m} onClick={() => { handleMonthSelect(m); setIsMobileSheetOpen(false); }} className="focus:bg-[#3c3c3e] focus:text-white">
+                                {m}
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-[#2c2c2e] transition-colors mt-1">
+                              <div className="flex items-center gap-4">
+                                <Globe className="h-5 w-5 text-blue-400" />
+                                <span className="text-lg">Continent</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-muted-foreground text-sm max-w-[120px]">
+                                <span className="truncate">{selectedContinent || "All"}</span>
+                                <ChevronDown className="h-4 w-4 shrink-0" />
+                              </div>
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-[200px] bg-[#2c2c2e] border-none text-gray-200">
+                            <DropdownMenuItem onClick={() => { setSelectedContinent(null); setIsMobileSheetOpen(false); }} className="focus:bg-[#3c3c3e] focus:text-white">All Continents</DropdownMenuItem>
+                            {continents.map((continent) => (
+                              <DropdownMenuItem key={continent} onClick={() => { setSelectedContinent(continent); setIsMobileSheetOpen(false); }} className="focus:bg-[#3c3c3e] focus:text-white">
+                                {continent}
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-[#2c2c2e] transition-colors mt-1">
+                              <div className="flex items-center gap-4">
+                                <Tag className="h-5 w-5 text-blue-400" />
+                                <span className="text-lg">Event Type</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-muted-foreground text-sm max-w-[120px]">
+                                <span className="truncate">{selectedEventType ? selectedEventType.charAt(0).toUpperCase() + selectedEventType.slice(1) : "All"}</span>
+                                <ChevronDown className="h-4 w-4 shrink-0" />
+                              </div>
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-[200px] bg-[#2c2c2e] border-none text-gray-200">
+                            <DropdownMenuItem onClick={() => { setSelectedEventType(null); setIsMobileSheetOpen(false); }} className="focus:bg-[#3c3c3e] focus:text-white">All Types</DropdownMenuItem>
+                            {eventTypes.map((type) => (
+                              <DropdownMenuItem key={type} onClick={() => { setSelectedEventType(type); setIsMobileSheetOpen(false); }} className="focus:bg-[#3c3c3e] focus:text-white">
+                                {type.charAt(0).toUpperCase() + type.slice(1)}
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+
+                      <div className="h-px bg-[#2c2c2e]/50 my-2 border-t border-dashed border-[#444]/30 mx-4" />
+
+                      {/* Accounts / Profile */}
+                      <div className="px-4 py-2">
+                        {session ? (
+                          <>
+                            <div className="flex items-center justify-between p-3 rounded-xl hover:bg-[#2c2c2e] transition-colors cursor-pointer group" onClick={() => { signOut(); setIsMobileSheetOpen(false); }}>
+                              <div className="flex items-center gap-4">
+                                <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
+                                  <User className="h-4 w-4 text-white" />
+                                </div>
+                                <div className="flex flex-col overflow-hidden">
+                                  <span className="text-lg leading-tight truncate">My Profile</span>
+                                  <span className="text-xs text-muted-foreground truncate">{session.user?.email}</span>
+                                </div>
+                              </div>
+                              <LogOut className="h-4 w-4 text-gray-500 group-hover:text-red-400" />
+                            </div>
+                            
+                            <button onClick={() => { setShowOnlySaved(!showOnlySaved); setIsMobileSheetOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-[#2c2c2e] transition-colors mt-2">
+                              <div className="flex items-center gap-4">
+                                <div className="h-6 w-6 rounded-full bg-[#916eff] flex items-center justify-center shrink-0">
+                                  <Heart className="h-3 w-3 text-white fill-white" />
+                                </div>
+                                <span className="text-lg">My Events ({savedEvents.length})</span>
+                              </div>
+                              <ChevronRight className="h-5 w-5 text-gray-500" />
+                            </button>
+                          </>
+                        ) : (
+                          <button onClick={() => { setAuthDialogOpen(true); setIsMobileSheetOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-[#2c2c2e] transition-colors">
+                            <div className="flex items-center gap-4">
+                              <div className="h-8 w-8 rounded-full bg-gray-600 flex items-center justify-center shrink-0">
+                                <User className="h-4 w-4 text-white" />
+                              </div>
+                              <span className="text-lg">Sign In</span>
+                            </div>
+                            <ChevronRight className="h-5 w-5 text-gray-500" />
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="h-px bg-[#2c2c2e]/50 my-2 border-t border-dashed border-[#444]/30 mx-4" />
+
+                      {/* Actions */}
+                      <div className="px-4 py-2 space-y-1">
+                        <button onClick={() => { setAddEventDialogOpen(true); setIsMobileSheetOpen(false); }} className="w-full flex items-center p-3 rounded-xl hover:bg-[#2c2c2e] transition-colors">
+                          <CalendarPlus className="h-5 w-5 text-gray-400 mr-4" />
+                          <span className="text-lg">Submit Event</span>
+                        </button>
+                        <button onClick={() => { handlePrint(); setIsMobileSheetOpen(false); }} className="w-full flex items-center p-3 rounded-xl hover:bg-[#2c2c2e] transition-colors">
+                          <FileDown className="h-5 w-5 text-gray-400 mr-4" />
+                          <span className="text-lg">Save PDF</span>
+                        </button>
+                      </div>
+
+                    </div>
+                  </SheetContent>
+                </Sheet>
               </div>
             </div>
 
-            <div className={`${isMobileMenuOpen ? "flex" : "hidden"} lg:flex flex-col lg:flex-row lg:items-center justify-between gap-4 mt-2 lg:mt-0`}>
+            <div className="hidden lg:flex flex-col lg:flex-row lg:items-center justify-between gap-4 mt-2 lg:mt-0">
               {/* Left side: Search and filters */}
               <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full lg:w-auto">
                 {/* View Toggle */}
