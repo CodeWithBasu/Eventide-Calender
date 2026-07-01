@@ -25,15 +25,7 @@ export const authOptions: AuthOptions = {
         });
 
         if (!user) {
-          // Auto-signup for demo purposes
-          const hashedPassword = await bcrypt.hash(credentials.password, 10);
-          const newUser = await prisma.user.create({
-            data: {
-              email: credentials.email,
-              password: hashedPassword,
-            },
-          });
-          return { id: newUser.id, email: newUser.email };
+          throw new Error("No user found with this email");
         }
 
         const isPasswordValid = await bcrypt.compare(credentials.password, user.password);

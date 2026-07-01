@@ -4,6 +4,29 @@ import { PrismaClient } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 const prisma = new PrismaClient();
+import bcrypt from "bcryptjs";
+
+export async function registerUser(data: any) {
+  try {
+    const existingUser = await prisma.user.findUnique({
+      where: { email: data.email }
+    });
+    if (existingUser) {
+      return { success: false, error: "User already exists" };
+    }
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+    const user = await prisma.user.create({
+      data: {
+        email: data.email,
+        password: hashedPassword,
+      }
+    });
+    return { success: true, user: { id: user.id, email: user.email } };
+  } catch (error) {
+    console.error("Failed to register user:", error);
+    return { success: false, error: "Failed to register user" };
+  }
+}
 
 export async function getEvents() {
   try {

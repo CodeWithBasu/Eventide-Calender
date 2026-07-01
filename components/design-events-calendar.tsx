@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input"
 import { SmoothInput } from "@/components/ui/smooth-input"
 import { ThemeToggleButton } from "./theme-toggle"
 import { useSession, signIn, signOut } from "next-auth/react"
-import { getEvents, addEvent, toggleSavedEvent, getSavedEvents } from "@/app/actions"
+import { getEvents, addEvent, toggleSavedEvent, getSavedEvents, registerUser } from "@/app/actions"
 import { Label } from "@/components/ui/label"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import {
@@ -184,6 +184,19 @@ export default function DesignEventsCalendar() {
     e.preventDefault()
     setIsLoading(true)
     try {
+      if (authMode === "signup") {
+        const res = await registerUser({ email: authEmail, password: authPassword })
+        if (!res.success) {
+          toast({
+            title: "Registration Failed",
+            description: res.error,
+            variant: "destructive",
+          })
+          setIsLoading(false)
+          return
+        }
+      }
+
       const result = await signIn("credentials", {
         redirect: false,
         email: authEmail,
