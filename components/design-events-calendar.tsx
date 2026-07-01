@@ -8,6 +8,7 @@ import { downloadICS } from "@/lib/generate-ics"
 import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { SmoothInput } from "@/components/ui/smooth-input"
 import { ThemeToggleButton } from "./theme-toggle"
 import { useSession, signIn, signOut } from "next-auth/react"
 import { getEvents, addEvent, toggleSavedEvent, getSavedEvents } from "@/app/actions"
@@ -441,12 +442,13 @@ export default function DesignEventsCalendar() {
 
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    type="text"
+                  <SmoothInput
+                    type="search"
                     placeholder="Search events..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-9 w-[200px]"
+                    className="pl-9 text-sm py-1.5 h-9"
+                    wrapperClassName="w-[200px] border border-input rounded-md"
                   />
                 </div>
 
@@ -520,24 +522,26 @@ export default function DesignEventsCalendar() {
                     <form onSubmit={handleLogin} className="space-y-4">
                       <div className="space-y-2">
                         <Label htmlFor="authEmail">Email</Label>
-                        <Input
+                        <SmoothInput
                           id="authEmail"
                           type="email"
                           required
                           value={authEmail}
                           onChange={(e) => setAuthEmail(e.target.value)}
                           placeholder="you@example.com"
+                          wrapperClassName="border border-input rounded-md"
                         />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="authPassword">Password</Label>
-                        <Input
+                        <SmoothInput
                           id="authPassword"
                           type="password"
                           required
                           value={authPassword}
                           onChange={(e) => setAuthPassword(e.target.value)}
                           placeholder="Enter your password"
+                          wrapperClassName="border border-input rounded-md"
                         />
                       </div>
                       <DialogFooter>
@@ -741,12 +745,13 @@ export default function DesignEventsCalendar() {
             {/* Title */}
             <div className="space-y-2">
               <Label className="text-[13px] font-semibold text-gray-200">Title</Label>
-              <Input
+              <SmoothInput
                 required
+                type="text"
                 value={newEvent.title}
                 onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
                 placeholder="Event title"
-                className="bg-[#121214] border-[#2a2a2c] h-11"
+                wrapperClassName="border border-[#2a2a2c] rounded-md"
               />
             </div>
 
