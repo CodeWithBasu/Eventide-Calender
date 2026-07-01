@@ -542,15 +542,15 @@ export default function DesignEventsCalendar() {
 
                     <div className="py-2">
                       {/* Views */}
-                      <div className="px-4 py-2">
-                        <button onClick={() => { setViewMode("calendar"); setIsMobileSheetOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-[#2c2c2e] transition-colors">
+                      <div className="px-4 py-2 animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationFillMode: 'both', animationDelay: '100ms' }}>
+                        <button onClick={() => { setViewMode("calendar"); setIsMobileSheetOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-[#2c2c2e] active:scale-[0.98] transition-all">
                           <div className="flex items-center gap-4">
                             <CalendarIcon className="h-5 w-5 text-gray-400" />
                             <span className="text-lg">Calendar</span>
                           </div>
                           {viewMode === "calendar" && <CheckCircle2 className="h-5 w-5 text-blue-500" />}
                         </button>
-                        <button onClick={() => { setViewMode("list"); setIsMobileSheetOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-[#2c2c2e] transition-colors mt-1">
+                        <button onClick={() => { setViewMode("list"); setIsMobileSheetOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-[#2c2c2e] active:scale-[0.98] transition-all mt-1">
                           <div className="flex items-center gap-4">
                             <ListIcon className="h-5 w-5 text-gray-400" />
                             <span className="text-lg">List</span>
@@ -562,10 +562,10 @@ export default function DesignEventsCalendar() {
                       <div className="h-px bg-[#2c2c2e]/50 my-2 border-t border-dashed border-[#444]/30 mx-4" />
 
                       {/* Filters / Selectors */}
-                      <div className="px-4 py-2">
+                      <div className="px-4 py-2 animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationFillMode: 'both', animationDelay: '150ms' }}>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <button className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-[#2c2c2e] transition-colors">
+                            <button className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-[#2c2c2e] active:scale-[0.98] transition-all">
                               <div className="flex items-center gap-4">
                                 <Filter className="h-5 w-5 text-gray-400" />
                                 <span className="text-lg">Month</span>
@@ -587,7 +587,7 @@ export default function DesignEventsCalendar() {
 
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <button className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-[#2c2c2e] transition-colors mt-1">
+                            <button className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-[#2c2c2e] active:scale-[0.98] transition-all mt-1">
                               <div className="flex items-center gap-4">
                                 <Globe className="h-5 w-5 text-blue-400" />
                                 <span className="text-lg">Continent</span>
@@ -610,7 +610,7 @@ export default function DesignEventsCalendar() {
 
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <button className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-[#2c2c2e] transition-colors mt-1">
+                            <button className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-[#2c2c2e] active:scale-[0.98] transition-all mt-1">
                               <div className="flex items-center gap-4">
                                 <Tag className="h-5 w-5 text-blue-400" />
                                 <span className="text-lg">Event Type</span>
@@ -635,10 +635,10 @@ export default function DesignEventsCalendar() {
                       <div className="h-px bg-[#2c2c2e]/50 my-2 border-t border-dashed border-[#444]/30 mx-4" />
 
                       {/* Accounts / Profile */}
-                      <div className="px-4 py-2">
+                      <div className="px-4 py-2 animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationFillMode: 'both', animationDelay: '200ms' }}>
                         {session ? (
                           <>
-                            <div className="flex items-center justify-between p-3 rounded-xl hover:bg-[#2c2c2e] transition-colors cursor-pointer group" onClick={() => { signOut(); setIsMobileSheetOpen(false); }}>
+                            <div className="flex items-center justify-between p-3 rounded-xl hover:bg-[#2c2c2e] active:scale-[0.98] transition-all cursor-pointer group" onClick={() => { signOut(); setIsMobileSheetOpen(false); }}>
                               <div className="flex items-center gap-4">
                                 <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
                                   <User className="h-4 w-4 text-white" />
@@ -651,7 +651,7 @@ export default function DesignEventsCalendar() {
                               <LogOut className="h-4 w-4 text-gray-500 group-hover:text-red-400" />
                             </div>
                             
-                            <button onClick={() => { setShowOnlySaved(!showOnlySaved); setIsMobileSheetOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-[#2c2c2e] transition-colors mt-2">
+                            <button onClick={() => { setShowOnlySaved(!showOnlySaved); setIsMobileSheetOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-[#2c2c2e] active:scale-[0.98] transition-all mt-2">
                               <div className="flex items-center gap-4">
                                 <div className="h-6 w-6 rounded-full bg-[#916eff] flex items-center justify-center shrink-0">
                                   <Heart className="h-3 w-3 text-white fill-white" />
@@ -662,7 +662,7 @@ export default function DesignEventsCalendar() {
                             </button>
                           </>
                         ) : (
-                          <button onClick={() => { setAuthDialogOpen(true); setIsMobileSheetOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-[#2c2c2e] transition-colors">
+                          <button onClick={() => { setAuthDialogOpen(true); setIsMobileSheetOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-[#2c2c2e] active:scale-[0.98] transition-all">
                             <div className="flex items-center gap-4">
                               <div className="h-8 w-8 rounded-full bg-gray-600 flex items-center justify-center shrink-0">
                                 <User className="h-4 w-4 text-white" />
@@ -677,12 +677,12 @@ export default function DesignEventsCalendar() {
                       <div className="h-px bg-[#2c2c2e]/50 my-2 border-t border-dashed border-[#444]/30 mx-4" />
 
                       {/* Actions */}
-                      <div className="px-4 py-2 space-y-1">
-                        <button onClick={() => { setAddEventDialogOpen(true); setIsMobileSheetOpen(false); }} className="w-full flex items-center p-3 rounded-xl hover:bg-[#2c2c2e] transition-colors">
+                      <div className="px-4 py-2 space-y-1 animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationFillMode: 'both', animationDelay: '250ms' }}>
+                        <button onClick={() => { setAddEventDialogOpen(true); setIsMobileSheetOpen(false); }} className="w-full flex items-center p-3 rounded-xl hover:bg-[#2c2c2e] active:scale-[0.98] transition-all">
                           <CalendarPlus className="h-5 w-5 text-gray-400 mr-4" />
                           <span className="text-lg">Submit Event</span>
                         </button>
-                        <button onClick={() => { handlePrint(); setIsMobileSheetOpen(false); }} className="w-full flex items-center p-3 rounded-xl hover:bg-[#2c2c2e] transition-colors">
+                        <button onClick={() => { handlePrint(); setIsMobileSheetOpen(false); }} className="w-full flex items-center p-3 rounded-xl hover:bg-[#2c2c2e] active:scale-[0.98] transition-all">
                           <FileDown className="h-5 w-5 text-gray-400 mr-4" />
                           <span className="text-lg">Save PDF</span>
                         </button>
