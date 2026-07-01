@@ -695,7 +695,7 @@ export default function DesignEventsCalendar() {
                   <CalendarPlus className="h-4 w-4 mr-2" />
                   Add to Calendar
                 </Button>
-                {isLoggedIn && (
+                {session && (
                   <Button
                     variant="outline"
                     className="flex-1 bg-transparent"
@@ -986,7 +986,7 @@ export default function DesignEventsCalendar() {
                                   )}
 
                                   <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    {isLoggedIn && (
+                                    {session && (
                                       <button
                                         onClick={(e) => {
                                           e.stopPropagation()
