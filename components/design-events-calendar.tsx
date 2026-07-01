@@ -526,7 +526,7 @@ export default function DesignEventsCalendar() {
                   transition={{ duration: 0.6, delay: 0.3 }}
                   className="text-sm text-muted-foreground mt-0.5"
                 >
-                  Your guide to UX/UI, motion and graphic design events
+                  Curated events for creative professionals and visionaries.
                 </motion.p>
               </motion.div>
               {/* Dark mode toggle and Mobile Menu */}
