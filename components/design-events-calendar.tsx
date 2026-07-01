@@ -263,8 +263,8 @@ export default function DesignEventsCalendar() {
       isCustom: true,
       name: newEvent.title,
       time: timeString,
-      location: "Custom",
-      flag: "🗓️", 
+      location: "",
+      flag: "", 
       url: "#",
       continent: "Online",
       month: addEventDate.month,
@@ -604,6 +604,7 @@ export default function DesignEventsCalendar() {
                   </div>
                 </div>
 
+              {selectedEvent.location && (
                 <div className="flex items-center gap-3 text-sm">
                   <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
                   <div>
@@ -613,6 +614,7 @@ export default function DesignEventsCalendar() {
                     {selectedEvent.venue && <p className="text-muted-foreground">{selectedEvent.venue}</p>}
                   </div>
                 </div>
+              )}
 
                 {selectedEvent.speakers && selectedEvent.speakers.length > 0 && (
                   <div className="flex items-center gap-3 text-sm">
@@ -919,10 +921,15 @@ export default function DesignEventsCalendar() {
                                     {event.edition}
                                   </span>
                                 )}
-                                <div className="text-muted-foreground mt-1">{event.time}</div>
-                                <div className="text-muted-foreground">
-                                  {event.location} {event.flag}
+                                <div className="mt-1 flex items-center text-muted-foreground/80">
+                                  <Clock className="h-3 w-3 mr-1" />
+                                  <span>{event.time}</span>
                                 </div>
+                                {event.location && (
+                                  <div className="text-muted-foreground mt-1 flex items-center justify-between">
+                                    <span>{event.location} {event.flag}</span>
+                                  </div>
+                                )}
 
                                 <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                   <button
