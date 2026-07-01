@@ -9,6 +9,8 @@ import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ThemeToggleButton } from "./theme-toggle"
+import { useSession, signIn, signOut } from "next-auth/react"
+import { getEvents, addEvent, toggleSavedEvent, getSavedEvents } from "@/app/actions"
 import { Label } from "@/components/ui/label"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import {
@@ -62,8 +64,7 @@ export default function DesignEventsCalendar() {
   const [selectedContinent, setSelectedContinent] = useState<string | null>(null)
   const [selectedEventType, setSelectedEventType] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [userEmail, setUserEmail] = useState("")
+  const { data: session, status } = useSession()
   const [savedEvents, setSavedEvents] = useState<string[]>([])
   const [showOnlySaved, setShowOnlySaved] = useState(false)
   const [authDialogOpen, setAuthDialogOpen] = useState(false)
@@ -92,16 +93,23 @@ export default function DesignEventsCalendar() {
   const { toast } = useToast()
 
   useEffect(() => {
-    const savedUser = localStorage.getItem("demoUser")
-    if (savedUser) {
-      setIsLoggedIn(true)
-      setUserEmail(savedUser)
-    }
-    const savedEventIds = localStorage.getItem("savedEvents")
-    if (savedEventIds) {
-      setSavedEvents(JSON.parse(savedEventIds))
-    }
+    getEvents().then((data) => {
+      if (data.length > 0) {
+        setLocalEvents(data as any)
+      } else {
+        // Fallback to static if db empty during testing
+        setLocalEvents(eventsData)
+      }
+    })
   }, [])
+
+  useEffect(() => {
+    if (session?.user?.id) {
+      getSavedEvents(session.user.id).then(setSavedEvents)
+    } else {
+      setSavedEvents([])
+    }
+  }, [session])
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -122,7 +130,7 @@ export default function DesignEventsCalendar() {
   }, [])
 
   useEffect(() => {
-    if (!isLoggedIn) {
+    if (!session && status !== "loading") {
       const timer = setTimeout(() => {
         toast({
           title: "Save your favorite events",
@@ -131,7 +139,7 @@ export default function DesignEventsCalendar() {
       }, 1500)
       return () => clearTimeout(timer)
     }
-  }, [isLoggedIn, toast])
+  }, [session, status, toast])
 
   const handleMonthSelect = (month: string) => {
     const element = document.getElementById(month.toLowerCase())
@@ -229,62 +237,79 @@ export default function DesignEventsCalendar() {
     setAddEventDialogOpen(true)
   }
 
-  const handleAddEventSubmit = (e: React.FormEvent) => {
+  const handleAddEvent = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!addEventDate) return
+    setIsLoading(true)
 
-    const timeString = newEvent.startTime && newEvent.endTime 
-      ? `${newEvent.startTime.replace("T", " ")} - ${newEvent.endTime.replace("T", " ")}` 
-      : "All Day"
+    const res = await addEvent(newEvent as any)
 
-    const newlyCreatedEvent: Event = {
-      id: editingEventId || Date.now().toString(),
-      isCustom: true,
-      name: newEvent.title,
-      time: timeString,
-      location: "",
-      flag: "", 
-      url: "#",
-      continent: "Online",
-      month: addEventDate.month,
-      startDay: addEventDate.day,
-      endDay: addEventDate.day,
-      eventType: newEvent.category,
-      description: newEvent.description,
-      color: newEvent.color,
-      tags: newEvent.tags,
-    }
-
-    if (editingEventId) {
-      setLocalEvents(localEvents.map(evt => evt.id === editingEventId ? newlyCreatedEvent : evt))
+    if (res.success && res.event) {
+      setLocalEvents((prev) => [res.event as any, ...prev])
+      setAddEventDialogOpen(false)
+      setNewEvent({
+        title: "",
+        description: "",
+        startTime: "",
+        endTime: "",
+        category: "Meeting",
+        color: "Blue",
+        tags: [],
+      })
       toast({
-        title: "Event Updated",
-        description: `${newEvent.title} has been updated!`,
+        title: "Event created successfully",
+        description: "Your custom event has been added to the calendar.",
       })
     } else {
-      setLocalEvents([...localEvents, newlyCreatedEvent])
       toast({
-        title: "Event Added",
-        description: `${newEvent.title} has been added!`,
+        title: "Error creating event",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
       })
     }
 
-    setAddEventDialogOpen(false)
+    setIsLoading(false)
   }
 
-  const toggleSaveEvent = (event: Event) => {
-    if (!isLoggedIn) {
+  const handleSaveEvent = async (e: React.MouseEvent, eventId: string) => {
+    e.stopPropagation()
+
+    if (!session) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to save events.",
+        variant: "destructive",
+      })
       setAuthDialogOpen(true)
       return
     }
 
-    const eventId = `${event.month}-${event.name}-${event.startDay}`
-    const newSavedEvents = savedEvents.includes(eventId)
-      ? savedEvents.filter((id) => id !== eventId)
-      : [...savedEvents, eventId]
+    // Optimistic UI update
+    setSavedEvents((prev) => {
+      if (prev.includes(eventId)) {
+        return prev.filter((id) => id !== eventId)
+      } else {
+        return [...prev, eventId]
+      }
+    })
 
-    setSavedEvents(newSavedEvents)
-    localStorage.setItem("savedEvents", JSON.stringify(newSavedEvents))
+    // Server action
+    const res = await toggleSavedEvent(session.user.id as string, eventId)
+    if (!res.success) {
+      // Revert if failed
+      toast({
+        title: "Error",
+        description: "Failed to save event. Please try again.",
+        variant: "destructive",
+      })
+      getSavedEvents(session.user.id as string).then(setSavedEvents)
+    } else {
+      toast({
+        title: res.saved ? "Event saved" : "Event removed",
+        description: res.saved
+          ? "This event has been added to your saved events."
+          : "This event has been removed from your saved events.",
+      })
+    }
   }
 
   const isEventSaved = (event: Event) => {
@@ -447,7 +472,7 @@ export default function DesignEventsCalendar() {
                           : "Create an account to save events and access them across devices."}
                       </DialogDescription>
                     </DialogHeader>
-                    <form onSubmit={handleAuthSubmit} className="space-y-4">
+                    <form onSubmit={handleLogin} className="space-y-4">
                       <div className="space-y-2">
                         <Label htmlFor="authEmail">Email</Label>
                         <Input
@@ -471,8 +496,8 @@ export default function DesignEventsCalendar() {
                         />
                       </div>
                       <DialogFooter>
-                        <Button type="submit" className="w-full">
-                          {authMode === "signin" ? "Sign In" : "Create Account"}
+                        <Button type="submit" className="w-full" disabled={isLoading}>
+                          {isLoading ? "Loading..." : authMode === "signin" ? "Sign In" : "Create Account"}
                         </Button>
                       </DialogFooter>
                       <div className="text-center text-sm text-muted-foreground">
@@ -500,19 +525,6 @@ export default function DesignEventsCalendar() {
                           </>
                         )}
                       </div>
-                      <div className="flex items-start gap-2 p-3 rounded-md bg-muted/50 text-sm text-muted-foreground">
-                        <User className="h-4 w-4 mt-0.5 shrink-0" />
-                        <p>
-                          For demo purposes, you can still sign in with any email and password to test the saved events
-                          feature.
-                        </p>
-                      </div>
-                      <div className="flex items-start gap-2 p-3 rounded-md bg-muted text-sm text-muted-foreground">
-                        <Database className="h-4 w-4 mt-0.5 shrink-0" />
-                        <p>
-                          To enable real authentication, connect a database (Supabase, Neon, etc.) with auth support.
-                        </p>
-                      </div>
                     </form>
                   </DialogContent>
                 </Dialog>
@@ -524,7 +536,7 @@ export default function DesignEventsCalendar() {
                   <FileDown className="h-4 w-4" />
                 </Button>
 
-                {isLoggedIn && (
+                {session && (
                   <Button
                     variant={showOnlySaved ? "default" : "outline"}
                     size="default"
@@ -535,17 +547,17 @@ export default function DesignEventsCalendar() {
                   </Button>
                 )}
 
-                {isLoggedIn ? (
+                {session ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="outline" size="default">
                         <User className="h-4 w-4" />
-                        {userEmail}
+                        {session.user?.email}
                         <ChevronDown />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={handleSignOut}>Sign Out</DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleLogout}>Sign Out</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 ) : (

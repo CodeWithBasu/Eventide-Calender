@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String       @id @default(cuid())
+  email         String       @unique
+  password      String
+  name          String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  savedEvents   SavedEvent[]
+}
+
+model Event {
+  id          String       @id @default(cuid())
+  name        String
+  date        String       // e.g., "August 18 - August 22"
+  startDay    Int
+  endDay      Int
+  location    String       // e.g., "Seattle, WA"
+  flag        String       // e.g., "🇺🇸"
+  category    String       // e.g., "Meeting"
+  color       String       // e.g., "Blue"
+  url         String
+  time        String       // e.g., "2:30 PM - 6:00 PM"
+  edition     String?
+  tags        String       // Comma separated string for simplicity, or we can use a related table. Let's use string for now.
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  savedBy     SavedEvent[]
+}
+
+model SavedEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  eventId   String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, eventId])
+}
