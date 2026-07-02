@@ -76,6 +76,22 @@ const dayColors = [
   [[239, 68, 68]],   // 6: Sunday (Red)
 ]
 
+const CrosshairIcon = ({ className, ...rest }: any) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth="1.5"
+      stroke="currentColor"
+      className={className}
+      {...rest}
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-6-6h12" />
+    </svg>
+  );
+};
+
 const months = [
   "January",
   "February",
@@ -1453,7 +1469,7 @@ export default function DesignEventsCalendar() {
                       onClick={() => {
                         if (day.date) openAddEventDialog(day.date, month)
                       }}
-                      className={`relative overflow-hidden bg-background p-1 sm:p-2 min-h-[80px] sm:min-h-[120px] transition-colors hover:bg-accent/50 ${day.date ? "cursor-pointer group" : ""} ${
+                      className={`relative bg-background p-1 sm:p-2 min-h-[80px] sm:min-h-[120px] transition-colors hover:bg-accent/50 ${day.date ? "cursor-pointer group/cell" : ""} ${
                         isToday(day.date) ? "ring-2 ring-inset ring-primary" : ""
                       }`}
                     >
@@ -1468,13 +1484,18 @@ export default function DesignEventsCalendar() {
                               transition={{ duration: 0.2 }}
                               className="absolute inset-0 z-0 pointer-events-none h-full w-full"
                             >
+                              <CrosshairIcon className="absolute h-4 w-4 -top-2 -left-2 text-white z-10" />
+                              <CrosshairIcon className="absolute h-4 w-4 -bottom-2 -left-2 text-white z-10" />
+                              <CrosshairIcon className="absolute h-4 w-4 -top-2 -right-2 text-white z-10" />
+                              <CrosshairIcon className="absolute h-4 w-4 -bottom-2 -right-2 text-white z-10" />
+
                               <CanvasRevealEffect
                                 animationSpeed={5}
-                                containerClassName="bg-transparent"
+                                containerClassName="bg-black"
                                 colors={dayColors[index % 7]}
                                 opacities={[0.2, 0.2, 0.2, 0.4, 0.4, 0.4, 0.8, 0.8, 1, 1]}
                                 dotSize={3}
-                                showGradient={false}
+                                showGradient={true}
                               />
                             </motion.div>
                           )}
@@ -1484,7 +1505,7 @@ export default function DesignEventsCalendar() {
                       <div className="relative z-10 h-full flex flex-col">
                         {day.date && (
                           <>
-                            <h3 className={`mb-1 sm:mb-2 font-mono font-light text-3xl sm:text-7xl transition-colors ${index % 7 === 6 ? "text-red-500" : ""} ${isToday(day.date) ? "bg-blue-600 text-white rounded-xl px-2 py-1 inline-block shadow-[0_0_20px_rgba(37,99,235,0.4)]" : ""}`}>
+                            <h3 className={`mb-1 sm:mb-2 font-mono font-light text-3xl sm:text-7xl transition-colors group-hover/cell:text-white ${index % 7 === 6 ? "text-red-500 group-hover/cell:text-red-400" : ""} ${isToday(day.date) ? "bg-blue-600 text-white rounded-xl px-2 py-1 inline-block shadow-[0_0_20px_rgba(37,99,235,0.4)]" : ""}`}>
                               {day.date}
                             </h3>
                             <div className="space-y-2">
@@ -1509,24 +1530,24 @@ export default function DesignEventsCalendar() {
                                   }`}
                                 >
                                   <div className={`font-semibold leading-tight mb-0.5 line-clamp-1 sm:line-clamp-none break-all sm:break-normal ${
-                                    event.color === "Blue" ? "text-blue-400" :
-                                    event.color === "Red" ? "text-red-400" :
-                                    event.color === "Green" ? "text-green-400" :
-                                    event.color === "Orange" ? "text-orange-400" :
-                                    event.color === "Purple" ? "text-purple-400" :
-                                    "text-foreground"
+                                    event.color === "Blue" ? "text-blue-400 group-hover/cell:text-blue-300" :
+                                    event.color === "Red" ? "text-red-400 group-hover/cell:text-red-300" :
+                                    event.color === "Green" ? "text-green-400 group-hover/cell:text-green-300" :
+                                    event.color === "Orange" ? "text-orange-400 group-hover/cell:text-orange-300" :
+                                    event.color === "Purple" ? "text-purple-400 group-hover/cell:text-purple-300" :
+                                    "text-foreground group-hover/cell:text-white"
                                   }`}>{event.name}</div>
                                   {event.edition && (
-                                    <span className="hidden sm:inline-block mt-1 text-[10px] bg-background px-1 py-0.5 rounded">
+                                    <span className="hidden sm:inline-block mt-1 text-[10px] bg-background px-1 py-0.5 rounded group-hover/cell:bg-white/10 group-hover/cell:text-white">
                                       {event.edition}
                                     </span>
                                   )}
-                                  <div className="hidden sm:flex mt-1 items-center text-muted-foreground/80">
+                                  <div className="hidden sm:flex mt-1 items-center text-muted-foreground/80 group-hover/cell:text-white/80">
                                     <Clock className="h-3 w-3 mr-1" />
                                     <span>{event.time}</span>
                                   </div>
                                   {event.location && (
-                                    <div className="hidden sm:flex text-muted-foreground mt-1 items-center justify-between">
+                                    <div className="hidden sm:flex text-muted-foreground mt-1 items-center justify-between group-hover/cell:text-white/70">
                                       <span>{event.location} {event.flag}</span>
                                     </div>
                                   )}
