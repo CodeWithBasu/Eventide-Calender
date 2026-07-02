@@ -909,7 +909,7 @@ export default function DesignEventsCalendar() {
             <div className="hidden lg:block w-[180px] shrink-0" />
             <div className="flex-1 grid grid-cols-7 border-border border-b-0">
               {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => (
-                <div key={day} className="bg-background p-1 sm:p-2 text-center font-medium text-[10px] sm:text-sm">
+                <div key={day} className={`bg-background p-1 sm:p-2 text-center font-medium text-[10px] sm:text-sm ${day === "Sunday" ? "text-red-500" : ""}`}>
                   <span className="hidden sm:inline">{day}</span>
                   <span className="sm:hidden">{day.slice(0, 3)}</span>
                 </div>
@@ -1288,7 +1288,7 @@ export default function DesignEventsCalendar() {
                     >
                       {day.date && (
                         <>
-                          <h3 className={`mb-1 sm:mb-2 font-mono font-light text-3xl sm:text-7xl ${isToday(day.date) ? "text-primary" : ""}`}>
+                          <h3 className={`mb-1 sm:mb-2 font-mono font-light text-3xl sm:text-7xl ${isToday(day.date) ? "text-primary" : ""} ${index % 7 === 6 ? "text-red-500" : ""}`}>
                             {day.date}
                           </h3>
                           <div className="space-y-2">
@@ -1380,7 +1380,7 @@ export default function DesignEventsCalendar() {
 
                       return (
                         <div key={day} className="space-y-3">
-                          <h3 className="text-[13px] text-muted-foreground font-medium pl-1">{dateStr}</h3>
+                          <h3 className={`text-[13px] font-medium pl-1 ${dateObj.getDay() === 0 ? "text-red-500" : "text-muted-foreground"}`}>{dateStr}</h3>
                           <div className="space-y-2">
                             {eventsForDay.map((event, idx) => {
                               const dotColor = 
