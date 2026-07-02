@@ -1369,7 +1369,7 @@ export default function DesignEventsCalendar() {
                     }, {} as Record<number, Event[]>)
 
                     if (Object.keys(grouped).length === 0) {
-                      return <div className="text-center py-12 border border-[#2a2a2c] border-dashed rounded-xl bg-[#0f0f11] text-muted-foreground">No events for {month}</div>
+                      return <div className="text-center py-12 border border-border dark:border-[#2a2a2c] border-dashed rounded-xl bg-card dark:bg-[#0f0f11] text-muted-foreground">No events for {month}</div>
                     }
 
                     return Object.keys(grouped).map(dayStr => {
@@ -1395,27 +1395,27 @@ export default function DesignEventsCalendar() {
                                 <div 
                                   key={idx} 
                                   onClick={() => handleEventClick(event)}
-                                  className="flex items-start justify-between p-4 rounded-xl border border-[#2a2a2c] bg-[#0f0f11] hover:border-border transition-colors cursor-pointer"
+                                  className="flex items-start justify-between p-4 rounded-xl border border-border dark:border-[#2a2a2c] bg-card dark:bg-[#0f0f11] hover:border-primary/50 dark:hover:border-border transition-colors cursor-pointer"
                                 >
                                   <div className="flex items-start gap-3">
                                     <div className={`w-[9px] h-[9px] rounded-full mt-1.5 shrink-0 ${dotColor}`}></div>
                                     <div>
-                                      <h4 className="text-[15px] font-semibold text-gray-100">
+                                      <h4 className="text-[15px] font-semibold text-foreground dark:text-gray-100">
                                         {event.name} 
                                         {event.edition && <span className="text-xs ml-2 bg-muted px-1.5 py-0.5 rounded text-muted-foreground font-normal">{event.edition}</span>}
                                       </h4>
                                       {event.description && (
-                                        <p className="text-[13px] text-gray-400 mt-1 max-w-2xl">{event.description}</p>
+                                        <p className="text-[13px] text-muted-foreground dark:text-gray-400 mt-1 max-w-2xl">{event.description}</p>
                                       )}
                                       <div className="flex flex-wrap items-center gap-3 mt-2.5">
-                                        <div className="flex items-center text-[12px] text-gray-400">
+                                        <div className="flex items-center text-[12px] text-muted-foreground dark:text-gray-400">
                                           <Clock className="h-3.5 w-3.5 mr-1.5" />
                                           {event.time}
                                         </div>
                                         {event.tags && event.tags.length > 0 && (
                                           <div className="flex items-center gap-1.5">
                                             {event.tags.map(tag => (
-                                              <span key={tag} className="text-[11px] px-2 py-0.5 rounded-full border border-[#2a2a2c] text-gray-300">
+                                              <span key={tag} className="text-[11px] px-2 py-0.5 rounded-full border border-border dark:border-[#2a2a2c] text-muted-foreground dark:text-gray-300">
                                                 {tag}
                                               </span>
                                             ))}
@@ -1425,7 +1425,7 @@ export default function DesignEventsCalendar() {
                                     </div>
                                   </div>
                                   <div className="shrink-0 ml-4 hidden sm:block">
-                                    <span className="text-[11px] px-2.5 py-1 rounded-full border border-[#2a2a2c] text-gray-300 font-medium capitalize">
+                                    <span className="text-[11px] px-2.5 py-1 rounded-full border border-border dark:border-[#2a2a2c] text-muted-foreground dark:text-gray-300 font-medium capitalize">
                                       {event.eventType || "Event"}
                                     </span>
                                   </div>
