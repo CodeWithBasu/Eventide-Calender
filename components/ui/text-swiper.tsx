@@ -62,7 +62,7 @@ export const EventideLogo = () => {
   return (
     <div className="group flex items-center justify-center gap-3 transition-all duration-300">
       <div className="w-8 h-8 sm:w-10 sm:h-10 transition-transform duration-500 group-hover:rotate-12 group-hover:scale-110">
-        <img src="/aug_27_calendar_icon.png" alt="Eventide Logo" className="w-full h-full object-contain drop-shadow-md" />
+        <img src="/aug_27_calendar_icon.png" alt="Eventide Logo" className="w-full h-full object-contain drop-shadow-md mix-blend-multiply dark:invert dark:mix-blend-screen" />
       </div>
       <FlipLink href="/" className="text-2xl sm:text-3xl tracking-tight normal-case pl-1">
         Eventide
