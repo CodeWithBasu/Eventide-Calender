@@ -1508,7 +1508,7 @@ export default function DesignEventsCalendar() {
                       <div className="relative z-10 h-full flex flex-col">
                         {day.date && (
                           <>
-                            <h3 className={`mb-1 sm:mb-2 font-mono font-light text-3xl sm:text-7xl transition-colors group-hover/cell:text-white ${index % 7 === 6 ? "text-red-500 group-hover/cell:text-red-400" : ""} ${isCurrentDay ? "bg-blue-600 text-white rounded-xl px-2 py-1 inline-block shadow-[0_0_20px_rgba(37,99,235,0.4)]" : ""}`}>
+                            <h3 className={`mb-1 sm:mb-2 font-mono font-light text-3xl sm:text-7xl transition-colors group-hover/cell:text-white ${index % 7 === 6 ? "text-red-500 group-hover/cell:text-red-400" : ""} ${isCurrentDay ? "text-white font-semibold" : ""}`}>
                               {day.date}
                             </h3>
                             <div className="space-y-2">
