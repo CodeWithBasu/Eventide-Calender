@@ -241,7 +241,7 @@ export default function DesignEventsCalendar() {
       })
       
       if (res.ok) {
-        await updateSession({ image: base64String })
+        await updateSession()
         toast({ title: "Success", description: "Avatar updated successfully." })
         setIsCropDialogOpen(false)
         setCropImageSrc(null)

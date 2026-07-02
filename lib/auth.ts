@@ -34,7 +34,7 @@ export const authOptions: AuthOptions = {
           throw new Error("Invalid password");
         }
 
-        return { id: user.id, email: user.email, image: user.image };
+        return { id: user.id, email: user.email, image: user.image ? `/api/avatar/${user.id}` : null };
       },
     }),
   ],
@@ -45,10 +45,10 @@ export const authOptions: AuthOptions = {
     async jwt({ token, user, trigger, session }) {
       if (user) {
         token.sub = user.id;
-        token.picture = user.image;
+        token.picture = user.image; // this will be the /api/avatar/id URL from authorize
       }
-      if (trigger === "update" && session?.image) {
-        token.picture = session.image;
+      if (trigger === "update") {
+        token.picture = `/api/avatar/${token.sub}?v=${Date.now()}`;
       }
       return token;
     },
