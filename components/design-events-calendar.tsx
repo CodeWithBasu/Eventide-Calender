@@ -1457,11 +1457,11 @@ export default function DesignEventsCalendar() {
               <div className="w-full lg:w-[180px] shrink-0 relative">
                 <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
                   <DotPattern
-                    className="opacity-100 text-blue-500/50"
-                    glow={true}
-                    width={20}
-                    height={20}
-                    cr={2}
+                    className="opacity-50 text-white [mask-image:linear-gradient(to_bottom,white,transparent)]"
+                    glow={false}
+                    width={16}
+                    height={16}
+                    cr={1}
                   />
                 </div>
                 <div className="sticky top-[190px] lg:top-[240px] self-start h-fit bg-background/90 backdrop-blur-md z-10 py-2 lg:py-0 -mx-6 px-6 lg:mx-0 lg:px-0">
