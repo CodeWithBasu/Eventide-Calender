@@ -62,8 +62,9 @@ import {
   Calendar as CalendarIcon
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import { EventideLogo } from "@/components/ui/text-swiper"
+import { CanvasRevealEffect } from "@/components/ui/canvas-reveal-effect"
 
 const months = [
   "January",
@@ -87,6 +88,7 @@ export default function DesignEventsCalendar() {
   const [selectedContinent, setSelectedContinent] = useState<string | null>(null)
   const [selectedEventType, setSelectedEventType] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
+  const [hoveredDateCell, setHoveredDateCell] = useState<string | null>(null)
   const { data: session, status, update: updateSession } = useSession()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isAvatarUploading, setIsAvatarUploading] = useState(false)
@@ -1431,23 +1433,53 @@ export default function DesignEventsCalendar() {
 
               {viewMode === "calendar" ? (
                 <div className="flex-1 grid grid-cols-7 gap-px bg-border border border-border">
-                  {monthData.map((day, index) => (
+                  {monthData.map((day, index) => {
+                    const cellId = `${month}-${day.date}`
+                    return (
                     <div
                       key={index}
+                      onMouseEnter={() => day.date && setHoveredDateCell(cellId)}
+                      onMouseLeave={() => setHoveredDateCell(null)}
                       onClick={() => {
                         if (day.date) openAddEventDialog(day.date, month)
                       }}
-                      className={`bg-background p-1 sm:p-2 min-h-[80px] sm:min-h-[120px] transition-colors hover:bg-accent/50 ${day.date ? "cursor-pointer" : ""} ${
+                      className={`relative overflow-hidden bg-background p-1 sm:p-2 min-h-[80px] sm:min-h-[120px] transition-colors hover:bg-accent/50 ${day.date ? "cursor-pointer group" : ""} ${
                         isToday(day.date) ? "ring-2 ring-inset ring-primary" : ""
                       }`}
                     >
                       {day.date && (
-                        <>
-                          <h3 className={`mb-1 sm:mb-2 font-mono font-light text-3xl sm:text-7xl ${index % 7 === 6 ? "text-red-500" : ""} ${isToday(day.date) ? "bg-blue-600 text-white rounded-xl px-2 py-1 inline-block shadow-[0_0_20px_rgba(37,99,235,0.4)]" : ""}`}>
-                            {day.date}
-                          </h3>
-                          <div className="space-y-2">
-                            {day.events.map((event, eventIndex) => {
+                        <AnimatePresence>
+                          {hoveredDateCell === cellId && (
+                            <motion.div
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                              className="absolute inset-0 z-0 pointer-events-none"
+                            >
+                              <CanvasRevealEffect
+                                animationSpeed={3}
+                                containerClassName="bg-transparent"
+                                colors={[
+                                  [59, 130, 246],
+                                  [139, 92, 246],
+                                ]}
+                                opacities={[0.1, 0.1, 0.1, 0.2, 0.2, 0.2, 0.2, 0.3, 0.3, 0.5]}
+                                dotSize={2}
+                                showGradient={false}
+                              />
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      )}
+                      
+                      <div className="relative z-10 h-full flex flex-col">
+                        {day.date && (
+                          <>
+                            <h3 className={`mb-1 sm:mb-2 font-mono font-light text-3xl sm:text-7xl transition-colors ${index % 7 === 6 ? "text-red-500" : ""} ${isToday(day.date) ? "bg-blue-600 text-white rounded-xl px-2 py-1 inline-block shadow-[0_0_20px_rgba(37,99,235,0.4)]" : ""}`}>
+                              {day.date}
+                            </h3>
+                            <div className="space-y-2">
+                              {day.events.map((event, eventIndex) => {
                               const eventId = `${event.month}-${event.name}-${event.startDay}`
                               const isSaved = isEventSaved(event)
 
@@ -1507,8 +1539,10 @@ export default function DesignEventsCalendar() {
                         </div>
                       </>
                     )}
+                    </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
               ) : (
                 <div className="flex-1 space-y-6">
