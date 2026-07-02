@@ -60,11 +60,19 @@ export const FlipLink: React.FC<FlipLinkProps> = ({ children, href, className = 
 
 export const EventideLogo = () => {
   return (
-    <div className="group flex items-center justify-center gap-2 transition-all duration-300">
-      <div className="transition-transform duration-500 group-hover:translate-x-1 group-hover:rotate-12 bg-gradient-to-br from-indigo-500 to-purple-500 p-1.5 rounded-lg text-white shadow-lg shadow-purple-500/20">
-        <CalendarDays className="w-5 h-5 sm:w-6 sm:h-6" />
+    <div className="group flex items-center justify-center gap-3 transition-all duration-300">
+      <div className="relative w-9 h-9 sm:w-10 sm:h-10 transition-transform duration-500 group-hover:scale-105" style={{ perspective: "1000px" }}>
+        <motion.div 
+          className="absolute inset-0 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white border-t border-l border-white/20 z-10"
+          initial={{ rotateX: 10, rotateY: -10 }}
+          whileHover={{ rotateX: 0, rotateY: 0, z: 10, x: -2, y: -2 }}
+          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          style={{ transformStyle: "preserve-3d", boxShadow: "2px 2px 0px #4338ca, 4px 4px 0px #3730a3, 6px 6px 15px rgba(0,0,0,0.4)" }}
+        >
+          <CalendarDays className="w-5 h-5 sm:w-6 sm:h-6 drop-shadow-md" style={{ transform: "translateZ(10px)" }} />
+        </motion.div>
       </div>
-      <FlipLink href="/" className="text-2xl sm:text-3xl tracking-tight normal-case">
+      <FlipLink href="/" className="text-2xl sm:text-3xl tracking-tight normal-case pl-1">
         Eventide
       </FlipLink>
     </div>
