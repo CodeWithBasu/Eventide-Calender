@@ -66,6 +66,16 @@ import { motion, AnimatePresence } from "framer-motion"
 import { EventideLogo } from "@/components/ui/text-swiper"
 import { CanvasRevealEffect } from "@/components/ui/canvas-reveal-effect"
 
+const dayColors = [
+  [[34, 197, 94]],   // 0: Monday (Green)
+  [[59, 130, 246]],  // 1: Tuesday (Blue)
+  [[234, 179, 8]],   // 2: Wednesday (Yellow)
+  [[236, 72, 153]],  // 3: Thursday (Pink)
+  [[165, 42, 42]],   // 4: Friday (Brown)
+  [[168, 85, 247]],  // 5: Saturday (Purple)
+  [[239, 68, 68]],   // 6: Sunday (Red)
+]
+
 const months = [
   "January",
   "February",
@@ -1461,10 +1471,7 @@ export default function DesignEventsCalendar() {
                               <CanvasRevealEffect
                                 animationSpeed={5}
                                 containerClassName="bg-transparent"
-                                colors={[
-                                  [59, 130, 246],
-                                  [139, 92, 246],
-                                ]}
+                                colors={dayColors[index % 7]}
                                 opacities={[0.2, 0.2, 0.2, 0.4, 0.4, 0.4, 0.8, 0.8, 1, 1]}
                                 dotSize={3}
                                 showGradient={false}
