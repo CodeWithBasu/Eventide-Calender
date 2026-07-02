@@ -1270,7 +1270,7 @@ export default function DesignEventsCalendar() {
 
           return (
             <div key={month} id={month.toLowerCase()} className="mb-16 flex flex-col lg:flex-row gap-4 lg:gap-8 relative">
-              <div className="w-full lg:w-[180px] shrink-0 sticky top-[150px] lg:top-[170px] self-start h-fit bg-background/90 backdrop-blur-md z-10 py-2 lg:py-0 -mx-6 px-6 lg:mx-0 lg:px-0">
+              <div className="w-full lg:w-[180px] shrink-0 sticky top-[190px] lg:top-[240px] self-start h-fit bg-background/90 backdrop-blur-md z-10 py-2 lg:py-0 -mx-6 px-6 lg:mx-0 lg:px-0">
                 <h2 className="text-3xl lg:text-4xl font-thin">{month}</h2>
               </div>
 
