@@ -65,6 +65,7 @@ import { useToast } from "@/hooks/use-toast"
 import { motion, AnimatePresence } from "framer-motion"
 import { EventideLogo } from "@/components/ui/text-swiper"
 import { CanvasRevealEffect } from "@/components/ui/canvas-reveal-effect"
+import { DotPattern } from "@/components/ui/dot-pattern"
 
 const dayColors = [
   [[0, 255, 100]],   // 0: Monday (Bold Green)
@@ -1453,8 +1454,16 @@ export default function DesignEventsCalendar() {
 
           return (
             <div key={month} id={month.toLowerCase()} className="mb-16 flex flex-col lg:flex-row gap-4 lg:gap-8 relative">
-              <div className="w-full lg:w-[180px] shrink-0 sticky top-[190px] lg:top-[240px] self-start h-fit bg-background/90 backdrop-blur-md z-10 py-2 lg:py-0 -mx-6 px-6 lg:mx-0 lg:px-0">
-                <h2 className="text-3xl lg:text-4xl font-thin">{month}</h2>
+              <div className="w-full lg:w-[180px] shrink-0 relative">
+                <div className="absolute inset-0 z-0 overflow-hidden hidden lg:block pointer-events-none">
+                  <DotPattern
+                    className="[mask-image:radial-gradient(300px_circle_at_top_left,white,transparent)] opacity-60"
+                    glow={true}
+                  />
+                </div>
+                <div className="sticky top-[190px] lg:top-[240px] self-start h-fit bg-background/90 backdrop-blur-md z-10 py-2 lg:py-0 -mx-6 px-6 lg:mx-0 lg:px-0">
+                  <h2 className="text-3xl lg:text-4xl font-thin">{month}</h2>
+                </div>
               </div>
 
               {viewMode === "calendar" ? (
