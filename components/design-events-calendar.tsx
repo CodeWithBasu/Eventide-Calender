@@ -1461,6 +1461,9 @@ export default function DesignEventsCalendar() {
                 <div className="flex-1 grid grid-cols-7 gap-px bg-border border border-border">
                   {monthData.map((day, index) => {
                     const cellId = `${month}-${day.date}`
+                    const isCurrentDay = isToday(day.date)
+                    const shouldShowCanvas = hoveredDateCell === cellId || isCurrentDay
+                    
                     return (
                     <div
                       key={index}
@@ -1470,12 +1473,12 @@ export default function DesignEventsCalendar() {
                         if (day.date) openAddEventDialog(day.date, month)
                       }}
                       className={`relative bg-background p-1 sm:p-2 min-h-[80px] sm:min-h-[120px] transition-colors hover:bg-accent/50 ${day.date ? "cursor-pointer group/cell" : ""} ${
-                        isToday(day.date) ? "ring-2 ring-inset ring-primary" : ""
+                        isCurrentDay ? "ring-2 ring-inset ring-primary" : ""
                       }`}
                     >
                       {day.date && (
                         <AnimatePresence>
-                          {hoveredDateCell === cellId && (
+                          {shouldShowCanvas && (
                             <motion.div
                               key={`canvas-${cellId}`}
                               initial={{ opacity: 0 }}
@@ -1505,7 +1508,7 @@ export default function DesignEventsCalendar() {
                       <div className="relative z-10 h-full flex flex-col">
                         {day.date && (
                           <>
-                            <h3 className={`mb-1 sm:mb-2 font-mono font-light text-3xl sm:text-7xl transition-colors group-hover/cell:text-white ${index % 7 === 6 ? "text-red-500 group-hover/cell:text-red-400" : ""} ${isToday(day.date) ? "bg-blue-600 text-white rounded-xl px-2 py-1 inline-block shadow-[0_0_20px_rgba(37,99,235,0.4)]" : ""}`}>
+                            <h3 className={`mb-1 sm:mb-2 font-mono font-light text-3xl sm:text-7xl transition-colors group-hover/cell:text-white ${index % 7 === 6 ? "text-red-500 group-hover/cell:text-red-400" : ""} ${isCurrentDay ? "bg-blue-600 text-white rounded-xl px-2 py-1 inline-block shadow-[0_0_20px_rgba(37,99,235,0.4)]" : ""}`}>
                               {day.date}
                             </h3>
                             <div className="space-y-2">
@@ -1535,19 +1538,19 @@ export default function DesignEventsCalendar() {
                                     event.color === "Green" ? "text-green-400 group-hover/cell:text-green-300" :
                                     event.color === "Orange" ? "text-orange-400 group-hover/cell:text-orange-300" :
                                     event.color === "Purple" ? "text-purple-400 group-hover/cell:text-purple-300" :
-                                    "text-foreground group-hover/cell:text-white"
+                                    (isCurrentDay ? "text-white" : "text-foreground group-hover/cell:text-white")
                                   }`}>{event.name}</div>
                                   {event.edition && (
-                                    <span className="hidden sm:inline-block mt-1 text-[10px] bg-background px-1 py-0.5 rounded group-hover/cell:bg-white/10 group-hover/cell:text-white">
+                                    <span className={`hidden sm:inline-block mt-1 text-[10px] px-1 py-0.5 rounded ${isCurrentDay ? "bg-white/10 text-white" : "bg-background group-hover/cell:bg-white/10 group-hover/cell:text-white"}`}>
                                       {event.edition}
                                     </span>
                                   )}
-                                  <div className="hidden sm:flex mt-1 items-center text-muted-foreground/80 group-hover/cell:text-white/80">
+                                  <div className={`hidden sm:flex mt-1 items-center ${isCurrentDay ? "text-white/80" : "text-muted-foreground/80 group-hover/cell:text-white/80"}`}>
                                     <Clock className="h-3 w-3 mr-1" />
                                     <span>{event.time}</span>
                                   </div>
                                   {event.location && (
-                                    <div className="hidden sm:flex text-muted-foreground mt-1 items-center justify-between group-hover/cell:text-white/70">
+                                    <div className={`hidden sm:flex mt-1 items-center justify-between ${isCurrentDay ? "text-white/70" : "text-muted-foreground group-hover/cell:text-white/70"}`}>
                                       <span>{event.location} {event.flag}</span>
                                     </div>
                                   )}
