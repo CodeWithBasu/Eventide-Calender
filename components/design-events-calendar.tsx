@@ -1451,20 +1451,22 @@ export default function DesignEventsCalendar() {
                         <AnimatePresence>
                           {hoveredDateCell === cellId && (
                             <motion.div
+                              key={`canvas-${cellId}`}
                               initial={{ opacity: 0 }}
                               animate={{ opacity: 1 }}
                               exit={{ opacity: 0 }}
-                              className="absolute inset-0 z-0 pointer-events-none"
+                              transition={{ duration: 0.2 }}
+                              className="absolute inset-0 z-0 pointer-events-none h-full w-full"
                             >
                               <CanvasRevealEffect
-                                animationSpeed={3}
+                                animationSpeed={5}
                                 containerClassName="bg-transparent"
                                 colors={[
                                   [59, 130, 246],
                                   [139, 92, 246],
                                 ]}
-                                opacities={[0.1, 0.1, 0.1, 0.2, 0.2, 0.2, 0.2, 0.3, 0.3, 0.5]}
-                                dotSize={2}
+                                opacities={[0.2, 0.2, 0.2, 0.4, 0.4, 0.4, 0.8, 0.8, 1, 1]}
+                                dotSize={3}
                                 showGradient={false}
                               />
                             </motion.div>
