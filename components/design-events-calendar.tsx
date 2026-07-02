@@ -146,8 +146,8 @@ export default function DesignEventsCalendar() {
   }, [])
 
   useEffect(() => {
-    if (session?.user?.id) {
-      getSavedEvents(session.user.id).then(setSavedEvents)
+    if (status === "authenticated" && (session?.user as any)?.id) {
+      getSavedEvents((session.user as any).id).then(setSavedEvents)
     } else {
       setSavedEvents([])
     }
@@ -451,9 +451,9 @@ export default function DesignEventsCalendar() {
       description: event.description || "",
       startTime,
       endTime,
-      category: event.eventType || "Meeting",
-      color: event.color || "Blue",
-      tags: event.tags || [],
+      category: event.category || "Meeting", 
+      color: event.color || "Blue", 
+      tags: typeof event.tags === "string" ? event.tags.split(",").filter(Boolean) : ((event.tags as unknown as string[]) || []),
     })
     
     setEventDialogOpen(false)
@@ -495,36 +495,30 @@ export default function DesignEventsCalendar() {
 
   const handleSaveEvent = async (e: React.MouseEvent, eventId: string) => {
     e.stopPropagation()
-
-    if (!session) {
-      toast({
-        title: "Authentication required",
-        description: "Please log in to save events.",
-        variant: "destructive",
-      })
-      setAuthDialogOpen(true)
+    
+    if (status !== "authenticated" || !(session?.user as any)?.id) {
+      toast({ title: "Authentication Required", description: "Please sign in to save events." })
       return
     }
 
-    // Optimistic UI update
-    setSavedEvents((prev) => {
-      if (prev.includes(eventId)) {
-        return prev.filter((id) => id !== eventId)
-      } else {
-        return [...prev, eventId]
-      }
-    })
-
-    // Server action
-    const res = await toggleSavedEvent(session.user.id as string, eventId)
+    const isCurrentlySaved = savedEvents.includes(eventId)
+    
+    // Optimistic update
+    if (isCurrentlySaved) {
+      setSavedEvents(prev => prev.filter(id => id !== eventId))
+    } else {
+      setSavedEvents(prev => [...prev, eventId])
+    }
+    
+    const res = await toggleSavedEvent((session.user as any).id as string, eventId)
     if (!res.success) {
       // Revert if failed
+      getSavedEvents((session.user as any).id as string).then(setSavedEvents)
       toast({
         title: "Error",
         description: "Failed to save event. Please try again.",
         variant: "destructive",
       })
-      getSavedEvents(session.user.id as string).then(setSavedEvents)
     } else {
       toast({
         title: res.saved ? "Event saved" : "Event removed",
@@ -1499,7 +1493,7 @@ export default function DesignEventsCalendar() {
                                   <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                     {session && (
                                       <button
-                                        onClick={(e) => handleSaveEvent(e, event.id)}
+                                        onClick={(e) => handleSaveEvent(e, event.id!)}
                                         className={`p-1 hover:bg-background rounded ${isSaved ? "opacity-100" : ""}`}
                                         title={isSaved ? "Remove from saved" : "Save event"}
                                       >
@@ -1575,7 +1569,7 @@ export default function DesignEventsCalendar() {
                                         </div>
                                         {event.tags && event.tags.length > 0 && (
                                           <div className="flex items-center gap-1.5">
-                                            {event.tags.map(tag => (
+                                            {(typeof event.tags === 'string' ? event.tags.split(',') : (event.tags as unknown as string[])).filter(Boolean).map((tag: string) => (
                                               <span key={tag} className="text-[11px] px-2 py-0.5 rounded-full border border-border dark:border-[#2a2a2c] text-muted-foreground dark:text-gray-300">
                                                 {tag}
                                               </span>

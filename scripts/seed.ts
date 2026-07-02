@@ -19,7 +19,7 @@ async function main() {
         url: event.url || "",
         time: event.time || "",
         edition: event.edition || "",
-        tags: event.tags?.join(",") || ""
+        tags: event.tags || ""
       }
     });
   }

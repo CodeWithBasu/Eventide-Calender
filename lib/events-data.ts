@@ -16,6 +16,8 @@ export interface Event {
   description?: string
   speakers?: string[]
   venue?: string
+  tags?: string
+  category?: string
 }
 
 export const eventsData: Event[] = [
