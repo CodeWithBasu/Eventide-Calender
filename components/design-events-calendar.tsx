@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { eventsData, type Event } from "@/lib/events-data"
 import { downloadICS } from "@/lib/generate-ics"
 import { Switch } from "@/components/ui/switch"
@@ -14,6 +14,8 @@ import { ThemeToggleButton } from "./theme-toggle"
 import { useSession, signIn, signOut } from "next-auth/react"
 import { getEvents, addEvent, toggleSavedEvent, getSavedEvents, registerUser, updateEvent, deleteEvent } from "@/app/actions"
 import { Label } from "@/components/ui/label"
+import Cropper from 'react-easy-crop'
+import type { Area } from 'react-easy-crop'
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import {
@@ -88,6 +90,11 @@ export default function DesignEventsCalendar() {
   const { data: session, status, update: updateSession } = useSession()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isAvatarUploading, setIsAvatarUploading] = useState(false)
+  const [cropImageSrc, setCropImageSrc] = useState<string | null>(null)
+  const [crop, setCrop] = useState({ x: 0, y: 0 })
+  const [zoom, setZoom] = useState(1)
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null)
+  const [isCropDialogOpen, setIsCropDialogOpen] = useState(false)
   const [savedEvents, setSavedEvents] = useState<string[]>([])
   const [showOnlySaved, setShowOnlySaved] = useState(false)
   const [authDialogOpen, setAuthDialogOpen] = useState(false)
@@ -180,58 +187,72 @@ export default function DesignEventsCalendar() {
     const file = e.target.files?.[0]
     if (!file) return
 
-    setIsAvatarUploading(true)
-    
     const reader = new FileReader()
     reader.onload = (e) => {
-      const img = new Image()
-      img.onload = async () => {
-        const canvas = document.createElement('canvas')
-        const MAX_WIDTH = 200
-        const MAX_HEIGHT = 200
-        let width = img.width
-        let height = img.height
-
-        if (width > height) {
-          if (width > MAX_WIDTH) {
-            height *= MAX_WIDTH / width
-            width = MAX_WIDTH
-          }
-        } else {
-          if (height > MAX_HEIGHT) {
-            width *= MAX_HEIGHT / height
-            height = MAX_HEIGHT
-          }
-        }
-
-        canvas.width = width
-        canvas.height = height
-        const ctx = canvas.getContext('2d')
-        ctx?.drawImage(img, 0, 0, width, height)
-        const base64String = canvas.toDataURL('image/jpeg', 0.8)
-
-        try {
-          const res = await fetch('/api/user/avatar', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ image: base64String })
-          })
-          
-          if (res.ok) {
-            await updateSession({ image: base64String })
-            toast({ title: "Success", description: "Avatar updated successfully." })
-          } else {
-            toast({ title: "Error", description: "Failed to update avatar.", variant: "destructive" })
-          }
-        } catch (error) {
-          toast({ title: "Error", description: "An error occurred.", variant: "destructive" })
-        } finally {
-          setIsAvatarUploading(false)
-        }
-      }
-      img.src = e.target?.result as string
+      setCropImageSrc(e.target?.result as string)
+      setIsCropDialogOpen(true)
+      setZoom(1)
+      setCrop({ x: 0, y: 0 })
     }
     reader.readAsDataURL(file)
+    e.target.value = ''
+  }
+
+  const handleCropComplete = useCallback((croppedArea: Area, croppedAreaPixels: Area) => {
+    setCroppedAreaPixels(croppedAreaPixels)
+  }, [])
+
+  const generateCroppedImage = async () => {
+    if (!cropImageSrc || !croppedAreaPixels) return
+
+    setIsAvatarUploading(true)
+    try {
+      const image = new Image()
+      image.src = cropImageSrc
+      await new Promise((resolve) => (image.onload = resolve))
+
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      
+      const MAX_SIZE = 200
+      canvas.width = MAX_SIZE
+      canvas.height = MAX_SIZE
+
+      if (ctx) {
+        ctx.drawImage(
+          image,
+          croppedAreaPixels.x,
+          croppedAreaPixels.y,
+          croppedAreaPixels.width,
+          croppedAreaPixels.height,
+          0,
+          0,
+          MAX_SIZE,
+          MAX_SIZE
+        )
+      }
+
+      const base64String = canvas.toDataURL('image/jpeg', 0.8)
+
+      const res = await fetch('/api/user/avatar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: base64String })
+      })
+      
+      if (res.ok) {
+        await updateSession({ image: base64String })
+        toast({ title: "Success", description: "Avatar updated successfully." })
+        setIsCropDialogOpen(false)
+        setCropImageSrc(null)
+      } else {
+        toast({ title: "Error", description: "Failed to update avatar.", variant: "destructive" })
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "An error occurred.", variant: "destructive" })
+    } finally {
+      setIsAvatarUploading(false)
+    }
   }
 
   const handleMonthSelect = (month: string) => {
@@ -576,6 +597,49 @@ export default function DesignEventsCalendar() {
 
   return (
     <div className="min-h-screen bg-background text-foreground relative">
+      <Dialog open={isCropDialogOpen} onOpenChange={setIsCropDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Adjust your Avatar</DialogTitle>
+            <DialogDescription>Move and scale the image to fit the circle.</DialogDescription>
+          </DialogHeader>
+          <div className="relative h-[300px] w-full bg-black/10 rounded-lg overflow-hidden">
+            {cropImageSrc && (
+              <Cropper
+                image={cropImageSrc}
+                crop={crop}
+                zoom={zoom}
+                aspect={1}
+                cropShape="round"
+                showGrid={false}
+                onCropChange={setCrop}
+                onCropComplete={handleCropComplete}
+                onZoomChange={setZoom}
+              />
+            )}
+          </div>
+          <div className="py-4">
+            <Label>Zoom</Label>
+            <input
+              type="range"
+              value={zoom}
+              min={1}
+              max={3}
+              step={0.1}
+              aria-labelledby="Zoom"
+              onChange={(e) => setZoom(Number(e.target.value))}
+              className="w-full mt-2 accent-primary"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsCropDialogOpen(false)} disabled={isAvatarUploading}>Cancel</Button>
+            <Button onClick={generateCroppedImage} disabled={isAvatarUploading}>
+              {isAvatarUploading ? "Saving..." : "Save Avatar"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <ProgressiveBlur position="bottom" className="fixed bottom-0 z-40 pointer-events-none" height="100px" />
       <header className="sticky top-0 bg-background border-b border-border z-50">
         <div className="px-6 py-4 pb-0">
