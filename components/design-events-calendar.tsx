@@ -60,6 +60,7 @@ import {
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { motion } from "framer-motion"
+import { EventideLogo } from "@/components/ui/text-swiper"
 
 const months = [
   "January",
@@ -513,13 +514,9 @@ export default function DesignEventsCalendar() {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
-                className="flex flex-col"
+                className="flex flex-col items-start"
               >
-                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-                  <a href="/" className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent hover:opacity-80 transition-opacity">
-                    Eventide
-                  </a>
-                </h1>
+                <EventideLogo />
                 <motion.p 
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
