@@ -20,7 +20,7 @@ export const BackgroundBoxes = ({
       {colsArray.map((_, i) => (
         <div
           key={`col-${i}`}
-          className="md:w-12 w-9 border-neutral-200 dark:border-white/10 flex flex-col shrink-0"
+          className="md:w-6 w-5 border-neutral-200 dark:border-white/10 flex flex-col shrink-0"
         >
           {rowsArray.map((_, j) => (
             <motion.div
@@ -33,7 +33,7 @@ export const BackgroundBoxes = ({
                 transition: { duration: 2 },
               }}
               className={cn(
-                "md:h-12 h-9 border-r border-t border-neutral-200 dark:border-white/10 relative shrink-0",
+                "md:h-6 h-5 border-r border-t border-neutral-200 dark:border-white/10 relative shrink-0",
                 j === rowsArray.length - 1 ? "border-b" : "",
                 i === 0 ? "border-l" : ""
               )}
