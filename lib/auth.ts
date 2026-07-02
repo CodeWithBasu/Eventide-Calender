@@ -34,7 +34,7 @@ export const authOptions: AuthOptions = {
           throw new Error("Invalid password");
         }
 
-        return { id: user.id, email: user.email };
+        return { id: user.id, email: user.email, image: user.image };
       },
     }),
   ],
@@ -42,9 +42,20 @@ export const authOptions: AuthOptions = {
     strategy: "jwt",
   },
   callbacks: {
+    async jwt({ token, user, trigger, session }) {
+      if (user) {
+        token.sub = user.id;
+        token.picture = user.image;
+      }
+      if (trigger === "update" && session?.image) {
+        token.picture = session.image;
+      }
+      return token;
+    },
     async session({ session, token }) {
       if (token && session.user) {
         (session.user as any).id = token.sub;
+        session.user.image = token.picture;
       }
       return session;
     },

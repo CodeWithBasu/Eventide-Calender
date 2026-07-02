@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { eventsData, type Event } from "@/lib/events-data"
 import { downloadICS } from "@/lib/generate-ics"
 import { Switch } from "@/components/ui/switch"
@@ -14,6 +14,7 @@ import { ThemeToggleButton } from "./theme-toggle"
 import { useSession, signIn, signOut } from "next-auth/react"
 import { getEvents, addEvent, toggleSavedEvent, getSavedEvents, registerUser, updateEvent, deleteEvent } from "@/app/actions"
 import { Label } from "@/components/ui/label"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import {
   Dialog,
@@ -84,7 +85,9 @@ export default function DesignEventsCalendar() {
   const [selectedContinent, setSelectedContinent] = useState<string | null>(null)
   const [selectedEventType, setSelectedEventType] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
-  const { data: session, status } = useSession()
+  const { data: session, status, update: updateSession } = useSession()
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [isAvatarUploading, setIsAvatarUploading] = useState(false)
   const [savedEvents, setSavedEvents] = useState<string[]>([])
   const [showOnlySaved, setShowOnlySaved] = useState(false)
   const [authDialogOpen, setAuthDialogOpen] = useState(false)
@@ -172,6 +175,64 @@ export default function DesignEventsCalendar() {
       return () => clearTimeout(timer)
     }
   }, [session, status, toast])
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setIsAvatarUploading(true)
+    
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const img = new Image()
+      img.onload = async () => {
+        const canvas = document.createElement('canvas')
+        const MAX_WIDTH = 200
+        const MAX_HEIGHT = 200
+        let width = img.width
+        let height = img.height
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width
+            width = MAX_WIDTH
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height
+            height = MAX_HEIGHT
+          }
+        }
+
+        canvas.width = width
+        canvas.height = height
+        const ctx = canvas.getContext('2d')
+        ctx?.drawImage(img, 0, 0, width, height)
+        const base64String = canvas.toDataURL('image/jpeg', 0.8)
+
+        try {
+          const res = await fetch('/api/user/avatar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: base64String })
+          })
+          
+          if (res.ok) {
+            await updateSession({ image: base64String })
+            toast({ title: "Success", description: "Avatar updated successfully." })
+          } else {
+            toast({ title: "Error", description: "Failed to update avatar.", variant: "destructive" })
+          }
+        } catch (error) {
+          toast({ title: "Error", description: "An error occurred.", variant: "destructive" })
+        } finally {
+          setIsAvatarUploading(false)
+        }
+      }
+      img.src = e.target?.result as string
+    }
+    reader.readAsDataURL(file)
+  }
 
   const handleMonthSelect = (month: string) => {
     const element = document.getElementById(month.toLowerCase())
@@ -668,17 +729,18 @@ export default function DesignEventsCalendar() {
                       <div className="px-4 py-2 animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationFillMode: 'both', animationDelay: '200ms' }}>
                         {session ? (
                           <>
-                            <div className="flex items-center justify-between p-3 rounded-xl hover:bg-[#2c2c2e] active:scale-[0.98] transition-all cursor-pointer group" onClick={() => { signOut(); setIsMobileSheetOpen(false); }}>
-                              <div className="flex items-center gap-4">
-                                <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
-                                  <User className="h-4 w-4 text-white" />
-                                </div>
+                            <div className="flex items-center justify-between p-3 rounded-xl hover:bg-[#2c2c2e] active:scale-[0.98] transition-all cursor-pointer group">
+                              <div className="flex items-center gap-4" onClick={() => fileInputRef.current?.click()}>
+                                <Avatar className="h-8 w-8 rounded-full border border-border shrink-0 bg-blue-600">
+                                  <AvatarImage src={session.user?.image || ""} className="object-cover" />
+                                  <AvatarFallback className="bg-blue-600 text-white"><User className="h-4 w-4" /></AvatarFallback>
+                                </Avatar>
                                 <div className="flex flex-col overflow-hidden">
-                                  <span className="text-lg leading-tight truncate">My Profile</span>
+                                  <span className="text-lg leading-tight truncate">My Profile {isAvatarUploading && "(Saving...)"}</span>
                                   <span className="text-xs text-muted-foreground truncate">{session.user?.email}</span>
                                 </div>
                               </div>
-                              <LogOut className="h-4 w-4 text-gray-500 group-hover:text-red-400" />
+                              <LogOut className="h-4 w-4 text-gray-500 hover:text-red-400" onClick={(e) => { e.stopPropagation(); signOut(); setIsMobileSheetOpen(false); }} />
                             </div>
                             
                             <button onClick={() => { setShowOnlySaved(!showOnlySaved); setIsMobileSheetOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-[#2c2c2e] active:scale-[0.98] transition-all mt-2">
@@ -909,18 +971,27 @@ export default function DesignEventsCalendar() {
                 )}
 
                 {session ? (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="default">
-                        <User className="h-4 w-4" />
-                        {session.user?.email}
-                        <ChevronDown />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => signOut()}>Sign Out</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <>
+                    <input type="file" accept="image/*" className="hidden" ref={fileInputRef} onChange={handleAvatarChange} />
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="default" className="pl-2 gap-2" disabled={isAvatarUploading}>
+                          <Avatar className="w-6 h-6 border border-border">
+                            <AvatarImage src={session.user?.image || ""} className="object-cover" />
+                            <AvatarFallback className="bg-blue-600 text-[10px] text-white"><User className="h-3 w-3" /></AvatarFallback>
+                          </Avatar>
+                          {session.user?.email}
+                          <ChevronDown className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
+                          {isAvatarUploading ? "Uploading..." : "Change Avatar"}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => signOut()}>Sign Out</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </>
                 ) : (
                   <Button variant="outline" size="default" onClick={() => setAuthDialogOpen(true)}>
                     <User className="h-4 w-4" />
