@@ -181,6 +181,17 @@ export default function DesignEventsCalendar() {
     }
   }
 
+  const handleScrollToToday = () => {
+    const today = new Date()
+    const currentMonth = months[today.getMonth()]
+    const element = document.getElementById(currentMonth.toLowerCase())
+    if (element) {
+      const y = element.getBoundingClientRect().top + window.scrollY - 200
+      window.scrollTo({ top: y, behavior: "smooth" })
+      window.history.pushState(null, "", `#${currentMonth.toLowerCase()}`)
+    }
+  }
+
   const handlePrint = () => {
     window.print()
   }
@@ -574,6 +585,14 @@ export default function DesignEventsCalendar() {
 
                       {/* Filters / Selectors */}
                       <div className="px-4 py-2 animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationFillMode: 'both', animationDelay: '150ms' }}>
+                        <button onClick={() => { handleScrollToToday(); setIsMobileSheetOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-[#2c2c2e] active:scale-[0.98] transition-all mb-2 bg-[#2a2a2c]/50 border border-[#333]">
+                          <div className="flex items-center gap-4">
+                            <div className="flex items-center justify-center w-5 h-5 bg-blue-500 text-white text-[10px] font-bold rounded-[4px] shadow-[0_0_10px_rgba(59,130,246,0.3)]">
+                              {new Date().getDate()}
+                            </div>
+                            <span className="text-lg">Go to Today</span>
+                          </div>
+                        </button>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <button className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-[#2c2c2e] active:scale-[0.98] transition-all">
@@ -737,6 +756,13 @@ export default function DesignEventsCalendar() {
                     wrapperClassName="w-full border border-input rounded-md"
                   />
                 </div>
+
+                <Button variant="outline" size="default" className="w-full sm:w-auto" onClick={handleScrollToToday}>
+                  <div className="flex items-center justify-center w-4 h-4 mr-2 bg-blue-500 text-white text-[9px] font-bold rounded-[3px] shadow-[0_0_10px_rgba(59,130,246,0.3)]">
+                    {new Date().getDate()}
+                  </div>
+                  Today
+                </Button>
 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -1288,7 +1314,7 @@ export default function DesignEventsCalendar() {
                     >
                       {day.date && (
                         <>
-                          <h3 className={`mb-1 sm:mb-2 font-mono font-light text-3xl sm:text-7xl ${isToday(day.date) ? "text-primary" : ""} ${index % 7 === 6 ? "text-red-500" : ""}`}>
+                          <h3 className={`mb-1 sm:mb-2 font-mono font-light text-3xl sm:text-7xl ${index % 7 === 6 ? "text-red-500" : ""} ${isToday(day.date) ? "bg-blue-600 text-white rounded-xl px-2 py-1 inline-block shadow-[0_0_20px_rgba(37,99,235,0.4)]" : ""}`}>
                             {day.date}
                           </h3>
                           <div className="space-y-2">
@@ -1380,7 +1406,7 @@ export default function DesignEventsCalendar() {
 
                       return (
                         <div key={day} className="space-y-3">
-                          <h3 className={`text-[13px] font-medium pl-1 ${dateObj.getDay() === 0 ? "text-red-500" : "text-muted-foreground"}`}>{dateStr}</h3>
+                          <h3 className={`text-[13px] font-medium ${isToday(day) ? "bg-blue-600 text-white rounded-md px-1.5 py-0.5 inline-block shadow-[0_0_10px_rgba(37,99,235,0.4)]" : dateObj.getDay() === 0 ? "text-red-500 pl-1" : "text-muted-foreground pl-1"}`}>{dateStr}</h3>
                           <div className="space-y-2">
                             {eventsForDay.map((event, idx) => {
                               const dotColor = 
