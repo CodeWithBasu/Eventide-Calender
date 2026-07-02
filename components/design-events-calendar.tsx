@@ -685,8 +685,20 @@ export default function DesignEventsCalendar() {
                   Curated events for creative professionals and visionaries.
                 </motion.p>
               </motion.div>
-              {/* Dark mode toggle and Mobile Menu */}
+              {/* Dark mode toggle, Today, and Mobile Menu */}
               <div className="flex items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  className="lg:hidden" 
+                  onClick={handleScrollToToday}
+                  aria-label="Go to Today"
+                >
+                  <div className="flex items-center justify-center w-5 h-5 bg-blue-500 text-white text-[11px] font-bold rounded-[4px] shadow-[0_0_10px_rgba(59,130,246,0.3)]">
+                    {new Date().getDate()}
+                  </div>
+                </Button>
+
                 <ThemeToggleButton variant="polygon" start="top-left" blur={true} />
                 
                 <Sheet open={isMobileSheetOpen} onOpenChange={setIsMobileSheetOpen}>
