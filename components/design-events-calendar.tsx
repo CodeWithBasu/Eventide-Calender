@@ -66,7 +66,6 @@ import { motion, AnimatePresence } from "framer-motion"
 import { EventideLogo } from "@/components/ui/text-swiper"
 import { CanvasRevealEffect } from "@/components/ui/canvas-reveal-effect"
 import { DotPattern } from "@/components/ui/dot-pattern"
-import { BackgroundBoxes } from "@/components/ui/background-boxes"
 
 const dayColors = [
   [[0, 255, 100]],   // 0: Monday (Bold Green)
@@ -1467,10 +1466,6 @@ export default function DesignEventsCalendar() {
 
           return (
             <div key={month} id={month.toLowerCase()} className="mb-16 flex flex-col lg:flex-row gap-4 lg:gap-8 relative">
-              {/* Mobile Background Boxes */}
-              <div className="absolute inset-x-0 -top-10 bottom-0 z-0 lg:hidden overflow-hidden [mask-image:linear-gradient(to_bottom,white,transparent)] pointer-events-none">
-                <BackgroundBoxes r={60} c={30} className="opacity-100" />
-              </div>
 
               <div className="w-full lg:w-[180px] shrink-0 relative z-10">
                 <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none hidden lg:block">
