@@ -709,7 +709,7 @@ export default function DesignEventsCalendar() {
               {/* Left side: Search and filters */}
               <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full lg:w-auto">
                 {/* View Toggle */}
-                <div className="flex bg-[#121214] p-1 rounded-md border border-[#2a2a2c] w-full sm:w-auto">
+                <div className="flex bg-muted dark:bg-[#121214] p-1 rounded-md border border-border dark:border-[#2a2a2c] w-full sm:w-auto">
                   <button 
                     onClick={() => setViewMode("calendar")}
                     className={`flex-1 sm:flex-none flex justify-center items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-sm transition-colors ${viewMode === "calendar" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
