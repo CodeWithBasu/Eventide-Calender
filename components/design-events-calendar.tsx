@@ -67,13 +67,13 @@ import { EventideLogo } from "@/components/ui/text-swiper"
 import { CanvasRevealEffect } from "@/components/ui/canvas-reveal-effect"
 
 const dayColors = [
-  [[34, 197, 94]],   // 0: Monday (Green)
-  [[59, 130, 246]],  // 1: Tuesday (Blue)
-  [[234, 179, 8]],   // 2: Wednesday (Yellow)
-  [[236, 72, 153]],  // 3: Thursday (Pink)
-  [[165, 42, 42]],   // 4: Friday (Brown)
-  [[168, 85, 247]],  // 5: Saturday (Purple)
-  [[239, 68, 68]],   // 6: Sunday (Red)
+  [[0, 255, 100]],   // 0: Monday (Bold Green)
+  [[0, 122, 255]],   // 1: Tuesday (Bold Blue)
+  [[255, 200, 0]],   // 2: Wednesday (Bold Yellow)
+  [[255, 50, 150]],  // 3: Thursday (Bold Pink)
+  [[205, 100, 50]],  // 4: Friday (Bold Brown/Orange)
+  [[160, 50, 255]],  // 5: Saturday (Bold Purple)
+  [[255, 30, 30]],   // 6: Sunday (Bold Red)
 ]
 
 const CrosshairIcon = ({ className, ...rest }: any) => {
@@ -1496,7 +1496,7 @@ export default function DesignEventsCalendar() {
                                 animationSpeed={5}
                                 containerClassName="bg-black"
                                 colors={dayColors[index % 7]}
-                                opacities={[0.2, 0.2, 0.2, 0.4, 0.4, 0.4, 0.8, 0.8, 1, 1]}
+                                opacities={[0.4, 0.4, 0.4, 0.6, 0.6, 0.6, 0.9, 0.9, 1, 1]}
                                 dotSize={3}
                                 showGradient={true}
                               />
