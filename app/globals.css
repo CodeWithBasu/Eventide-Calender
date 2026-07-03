@@ -162,6 +162,11 @@
     @apply bg-background text-foreground;
   }
 
+  ::selection {
+    background-color: white;
+    color: black;
+  }
+
   /* Add dark mode styles for date input calendar icons */
   input[type="date"]::-webkit-calendar-picker-indicator {
     cursor: pointer;
