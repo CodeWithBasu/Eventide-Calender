@@ -1,6 +1,4 @@
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/eventide-logo-or-similar" alt="Eventide Logo" width="120" />
-
   # 🌌 Eventide Calendar
 
   **A futuristic, high-performance, and deeply interactive 3D calendar built for the next generation of the web.**
