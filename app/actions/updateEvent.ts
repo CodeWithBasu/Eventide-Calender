@@ -1,23 +1,18 @@
 "use server"
 
-import { getServerSession } from "next-auth/next"
+
 import { PrismaClient } from "@prisma/client"
 
 const prisma = new PrismaClient()
 
 export async function updateEventDate(eventId: string, newStartDay: number, newMonth: string) {
   try {
-    const session = await getServerSession()
-    if (!session?.user?.email) {
-      return { success: false, error: "Unauthorized" }
-    }
-
     const event = await prisma.event.findUnique({
       where: { id: eventId }
     })
 
-    if (!event || event.userEmail !== session.user.email) {
-      return { success: false, error: "Event not found or unauthorized" }
+    if (!event) {
+      return { success: false, error: "Event not found" }
     }
 
     const updatedEvent = await prisma.event.update({
