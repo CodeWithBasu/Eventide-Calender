@@ -117,6 +117,7 @@ export default function DesignEventsCalendar() {
   const [selectedContinent, setSelectedContinent] = useState<string | null>(null)
   const [selectedEventType, setSelectedEventType] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
+  const [isSearchFocused, setIsSearchFocused] = useState(false)
   const [hoveredDateCell, setHoveredDateCell] = useState<string | null>(null)
   const { data: session, status, update: updateSession } = useSession()
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -908,17 +909,44 @@ export default function DesignEventsCalendar() {
                   </button>
                 </div>
 
-                <div className="relative w-full sm:w-[200px]">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <SmoothInput
-                    type="search"
-                    placeholder="Search events..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-9 text-sm py-1.5 h-9"
-                    wrapperClassName="w-full border border-input rounded-md"
-                  />
-                </div>
+                  <div className="relative w-full sm:w-[200px]">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+                    <div onFocus={() => setIsSearchFocused(true)} onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}>
+                      <SmoothInput
+                        type="search"
+                        placeholder="Search events..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-9 text-sm py-1.5 h-9"
+                        wrapperClassName="w-full border border-input rounded-md"
+                      />
+                    </div>
+                    
+                    {/* Autocomplete Dropdown */}
+                    {isSearchFocused && searchQuery.length > 0 && (
+                      <div className="absolute top-full left-0 mt-2 w-full sm:w-[250px] bg-[#1a1a1c] border border-[#2c2c2e] rounded-md shadow-lg z-50 max-h-[300px] overflow-y-auto">
+                        {filteredEvents.length > 0 ? (
+                          filteredEvents.slice(0, 5).map((event) => (
+                            <div 
+                              key={event.id}
+                              className="px-3 py-2 border-b border-[#2c2c2e] last:border-0 cursor-pointer hover:bg-[#2c2c2e] transition-colors"
+                              onMouseDown={(e) => {
+                                e.preventDefault();
+                                handleEventClick(event);
+                                setSearchQuery("");
+                                setIsSearchFocused(false);
+                              }}
+                            >
+                              <div className="text-sm font-medium text-gray-200">{event.name}</div>
+                              <div className="text-xs text-gray-400">{event.month} {event.startDay} - {event.time}</div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="px-3 py-3 text-sm text-gray-400 text-center">No events found.</div>
+                        )}
+                      </div>
+                    )}
+                  </div>
 
                 <Button variant="outline" size="default" className="w-full sm:w-auto" onClick={handleScrollToToday}>
                   <div className="flex items-center justify-center w-4 h-4 mr-2 bg-blue-500 text-white text-[9px] font-bold rounded-[3px] shadow-[0_0_10px_rgba(59,130,246,0.3)]">
