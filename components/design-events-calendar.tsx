@@ -124,6 +124,7 @@ export default function DesignEventsCalendar() {
   const [isSearchFocused, setIsSearchFocused] = useState(false)
   const [hoveredDateCell, setHoveredDateCell] = useState<string | null>(null)
   const [timeProgress, setTimeProgress] = useState(0)
+  const [currentTimeStr, setCurrentTimeStr] = useState("")
   const [isSoundEnabled, setIsSoundEnabled] = useState(true)
 
   useEffect(() => {
@@ -136,6 +137,8 @@ export default function DesignEventsCalendar() {
       const totalMinutes = 24 * 60
       const currentMinutes = now.getHours() * 60 + now.getMinutes()
       setTimeProgress((currentMinutes / totalMinutes) * 100)
+      
+      setCurrentTimeStr(now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }))
     }
     updateProgress()
     const interval = setInterval(updateProgress, 60000)
@@ -1666,13 +1669,10 @@ export default function DesignEventsCalendar() {
                       <div className="relative z-10 h-full flex flex-col">
                         {isCurrentDay && (
                           <>
-                            {/* Aurora Glow for Today */}
-                            <div className="absolute inset-0 -z-10 opacity-30 bg-[linear-gradient(45deg,#4f46e5,#9333ea,#ec4899,#4f46e5)] bg-[length:200%_200%] animate-[aurora_8s_ease_infinite] mix-blend-screen rounded-[inherit]" />
-                            {/* Time Progress Line for Today */}
-                            <div 
-                              className="absolute top-0 left-0 h-[2px] bg-blue-400 shadow-[0_0_8px_#60a5fa] z-20 transition-all duration-1000" 
-                              style={{ width: `${timeProgress}%` }}
-                            />
+                            {/* Current Time Text */}
+                            <div className="absolute top-2 right-2 z-20 text-blue-400 font-mono text-sm sm:text-base font-bold drop-shadow-[0_0_8px_rgba(96,165,250,0.8)] animate-pulse">
+                              {currentTimeStr}
+                            </div>
                           </>
                         )}
                         {day.date && (
