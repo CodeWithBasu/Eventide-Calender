@@ -33,7 +33,7 @@ Eventide leverages a modern full-stack Serverless architecture for maximum scala
 ```mermaid
 graph TD
     %% User Flow
-    User((🧑‍💻 User)) -->|Interacts| Client[Next.js Client Components]
+    User((User)) -->|Interacts| Client[Next.js Client Components]
     
     %% Client Tier
     subgraph Frontend [UI & Interactivity]
@@ -43,7 +43,7 @@ graph TD
     end
     
     %% Network Tier
-    Client -->|Server Actions / API| Server[Next.js Server (Vercel)]
+    Client -->|Server Actions / API| Server[Next.js Server]
     
     %% Backend Tier
     subgraph Backend [Server & Data]
