@@ -1563,7 +1563,7 @@ export default function DesignEventsCalendar() {
                   />
                 </div>
                 <div className="sticky top-[190px] lg:top-[240px] self-start h-fit bg-background/90 backdrop-blur-md z-10 py-2 lg:py-0 -mx-6 px-6 lg:mx-0 lg:px-0">
-                  <HackerText className="text-3xl lg:text-4xl font-thin" text={month} />
+                  <HackerText className="text-3xl lg:text-4xl font-bold" text={month} />
                 </div>
               </div>
 
