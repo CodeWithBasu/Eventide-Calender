@@ -119,6 +119,20 @@ export default function DesignEventsCalendar() {
   const [searchQuery, setSearchQuery] = useState("")
   const [isSearchFocused, setIsSearchFocused] = useState(false)
   const [hoveredDateCell, setHoveredDateCell] = useState<string | null>(null)
+  const [timeProgress, setTimeProgress] = useState(0)
+
+  useEffect(() => {
+    const updateProgress = () => {
+      const now = new Date()
+      const totalMinutes = 24 * 60
+      const currentMinutes = now.getHours() * 60 + now.getMinutes()
+      setTimeProgress((currentMinutes / totalMinutes) * 100)
+    }
+    updateProgress()
+    const interval = setInterval(updateProgress, 60000)
+    return () => clearInterval(interval)
+  }, [])
+
   const { data: session, status, update: updateSession } = useSession()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isAvatarUploading, setIsAvatarUploading] = useState(false)
@@ -1575,9 +1589,20 @@ export default function DesignEventsCalendar() {
                       )}
                       
                       <div className="relative z-10 h-full flex flex-col">
+                        {isCurrentDay && (
+                          <>
+                            {/* Aurora Glow for Today */}
+                            <div className="absolute inset-0 -z-10 opacity-30 bg-[linear-gradient(45deg,#4f46e5,#9333ea,#ec4899,#4f46e5)] bg-[length:200%_200%] animate-[aurora_8s_ease_infinite] mix-blend-screen rounded-[inherit]" />
+                            {/* Time Progress Line for Today */}
+                            <div 
+                              className="absolute top-0 left-0 h-[2px] bg-blue-400 shadow-[0_0_8px_#60a5fa] z-20 transition-all duration-1000" 
+                              style={{ width: `${timeProgress}%` }}
+                            />
+                          </>
+                        )}
                         {day.date && (
                           <>
-                            <h3 className={`mb-1 sm:mb-2 font-mono font-light text-3xl sm:text-7xl transition-colors group-hover/cell:text-white ${index % 7 === 6 ? "text-red-500 group-hover/cell:text-red-400" : ""} ${isCurrentDay ? "text-white font-semibold" : ""}`}>
+                            <h3 className={`mb-1 sm:mb-2 font-mono font-light text-3xl sm:text-7xl transition-colors group-hover/cell:text-white ${index % 7 === 6 ? "text-red-500 group-hover/cell:text-red-400" : ""} ${isCurrentDay ? "text-white font-semibold drop-shadow-md" : ""}`}>
                               {day.date}
                             </h3>
                             <div className="space-y-2">
