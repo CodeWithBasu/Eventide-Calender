@@ -1611,16 +1611,20 @@ export default function DesignEventsCalendar() {
                         if (eventToUpdate && (eventToUpdate.startDay !== day.date || eventToUpdate.month !== month)) {
                           const originalDay = eventToUpdate.startDay;
                           const originalMonth = eventToUpdate.month;
+                          const originalEndDay = eventToUpdate.endDay;
+                          
+                          const duration = eventToUpdate.endDay - eventToUpdate.startDay;
+                          const newEndDay = day.date! + duration;
                           
                           setLocalEvents(prev => prev.map(ev => 
-                            ev.id === eventId ? { ...ev, startDay: day.date!, month: month } : ev
+                            ev.id === eventId ? { ...ev, startDay: day.date!, endDay: newEndDay, month: month } : ev
                           ));
 
                           const res = await updateEventDate(eventId, day.date, month);
                           if (!res.success) {
                             // Revert on failure
                             setLocalEvents(prev => prev.map(ev => 
-                              ev.id === eventId ? { ...ev, startDay: originalDay, month: originalMonth } : ev
+                              ev.id === eventId ? { ...ev, startDay: originalDay, endDay: originalEndDay, month: originalMonth } : ev
                             ));
                             alert(res.error || "Failed to update event date");
                           }
