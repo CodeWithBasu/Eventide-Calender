@@ -1,7 +1,9 @@
 "use server"
 
 import { getServerSession } from "next-auth/next"
-import { prisma } from "@/lib/prisma"
+import { PrismaClient } from "@prisma/client"
+
+const prisma = new PrismaClient()
 
 export async function updateEventDate(eventId: string, newStartDay: number, newMonth: string) {
   try {

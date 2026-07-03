@@ -71,10 +71,7 @@ import { playHoverSound, playClickSound, toggleSounds } from "@/lib/sounds"
 import { useToast } from "@/hooks/use-toast"
 import { motion, AnimatePresence } from "framer-motion"
 import { EventideLogo } from "@/components/ui/text-swiper"
-import { CanvasRevealEffect } from "@/components/ui/canvas-reveal-effect"
 import { DotPattern } from "@/components/ui/dot-pattern"
-import { HackerText } from "@/components/ui/hacker-text"
-import { SpotlightCard } from "@/components/ui/spotlight-card"
 
 const dayColors = [
   [[0, 255, 100]],   // 0: Monday (Bold Green)
