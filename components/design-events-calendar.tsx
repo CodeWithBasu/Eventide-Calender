@@ -58,10 +58,16 @@ import {
   Filter,
   Globe,
   Tag,
+  Volume2,
+  VolumeX,
   LogOut,
   ChevronRight,
   Calendar as CalendarIcon
 } from "lucide-react"
+import { SpotlightCard } from "@/components/ui/spotlight-card"
+import { HackerText } from "@/components/ui/hacker-text"
+import { CanvasRevealEffect } from "@/components/ui/canvas-reveal-effect"
+import { playHoverSound, playClickSound, toggleSounds } from "@/lib/sounds"
 import { useToast } from "@/hooks/use-toast"
 import { motion, AnimatePresence } from "framer-motion"
 import { EventideLogo } from "@/components/ui/text-swiper"
@@ -121,6 +127,11 @@ export default function DesignEventsCalendar() {
   const [isSearchFocused, setIsSearchFocused] = useState(false)
   const [hoveredDateCell, setHoveredDateCell] = useState<string | null>(null)
   const [timeProgress, setTimeProgress] = useState(0)
+  const [isSoundEnabled, setIsSoundEnabled] = useState(true)
+
+  useEffect(() => {
+    toggleSounds(isSoundEnabled)
+  }, [isSoundEnabled])
 
   useEffect(() => {
     const updateProgress = () => {
@@ -717,7 +728,21 @@ export default function DesignEventsCalendar() {
                   </div>
                 </Button>
 
-                <ThemeToggleButton variant="polygon" start="top-left" blur={true} />
+                <div className="flex items-center gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="icon" 
+                    className="w-10 h-10 rounded-xl"
+                    onClick={() => {
+                      playClickSound();
+                      setIsSoundEnabled(!isSoundEnabled);
+                    }}
+                    onMouseEnter={playHoverSound}
+                  >
+                    {isSoundEnabled ? <Volume2 className="h-4 w-4 text-blue-500" /> : <VolumeX className="h-4 w-4 text-muted-foreground" />}
+                  </Button>
+                  <ThemeToggleButton variant="polygon" start="top-left" blur={true} />
+                </div>
                 
                 <Sheet open={isMobileSheetOpen} onOpenChange={setIsMobileSheetOpen}>
                   <SheetTrigger asChild>
@@ -926,7 +951,11 @@ export default function DesignEventsCalendar() {
 
                   <div className="relative w-full sm:w-[200px]">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
-                    <div onFocus={() => setIsSearchFocused(true)} onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}>
+                    <div 
+                      onFocus={() => setIsSearchFocused(true)} 
+                      onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
+                      onMouseEnter={playHoverSound}
+                    >
                       <SmoothInput
                         type="search"
                         placeholder="Search events..."
