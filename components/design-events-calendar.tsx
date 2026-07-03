@@ -124,7 +124,6 @@ export default function DesignEventsCalendar() {
   const [isSearchFocused, setIsSearchFocused] = useState(false)
   const [hoveredDateCell, setHoveredDateCell] = useState<string | null>(null)
   const [timeProgress, setTimeProgress] = useState(0)
-  const [currentTimeStr, setCurrentTimeStr] = useState("")
   const [isSoundEnabled, setIsSoundEnabled] = useState(true)
 
   useEffect(() => {
@@ -137,8 +136,6 @@ export default function DesignEventsCalendar() {
       const totalMinutes = 24 * 60
       const currentMinutes = now.getHours() * 60 + now.getMinutes()
       setTimeProgress((currentMinutes / totalMinutes) * 100)
-      
-      setCurrentTimeStr(now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }))
     }
     updateProgress()
     const interval = setInterval(updateProgress, 60000)
@@ -1667,14 +1664,6 @@ export default function DesignEventsCalendar() {
                       )}
                       
                       <div className="relative z-10 h-full flex flex-col">
-                        {isCurrentDay && (
-                          <>
-                            {/* Current Time Text */}
-                            <div className="absolute top-2 right-2 z-20 text-blue-400 font-mono text-sm sm:text-base font-bold drop-shadow-[0_0_8px_rgba(96,165,250,0.8)] animate-pulse">
-                              {currentTimeStr}
-                            </div>
-                          </>
-                        )}
                         {day.date && (
                           <>
                             <h3 className={`mb-1 sm:mb-2 font-mono font-light text-3xl sm:text-7xl transition-colors group-hover/cell:text-white ${index % 7 === 6 ? "text-red-500 group-hover/cell:text-red-400" : ""} ${isCurrentDay ? "text-white font-semibold drop-shadow-md" : ""}`}>
