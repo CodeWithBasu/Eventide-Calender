@@ -979,12 +979,26 @@ export default function DesignEventsCalendar() {
                   </DropdownMenuContent>
                 </DropdownMenu>
 
+                <Button 
+                  variant="outline" 
+                  size="default"
+                  onClick={() => {
+                    if (session) {
+                      if (!addEventDate) {
+                        const today = new Date();
+                        const monthName = today.toLocaleString('default', { month: 'long' });
+                        setAddEventDate({ month: monthName, day: today.getDate() });
+                      }
+                      setAddEventDialogOpen(true);
+                    } else {
+                      setAuthDialogOpen(true);
+                    }
+                  }}
+                >
+                  Submit Your Event
+                </Button>
+  
                 <Dialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" size="default">
-                      Submit Your Event
-                    </Button>
-                  </DialogTrigger>
                   <DialogContent className="sm:max-w-[500px]">
                     <DialogHeader>
                       <DialogTitle>{authMode === "signin" ? "Sign In" : "Create Account"}</DialogTitle>
