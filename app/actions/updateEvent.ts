@@ -15,11 +15,17 @@ export async function updateEventDate(eventId: string, newStartDay: number, newM
       return { success: false, error: "Event not found" }
     }
 
+    const duration = event.endDay - event.startDay
+    const newEndDay = newStartDay + duration
+    const newDateStr = `${newMonth} ${newStartDay}${newEndDay !== newStartDay ? ` - ${newEndDay}` : ""}`
+
     const updatedEvent = await prisma.event.update({
       where: { id: eventId },
       data: {
         startDay: newStartDay,
-        month: newMonth
+        endDay: newEndDay,
+        month: newMonth,
+        date: newDateStr
       }
     })
 
