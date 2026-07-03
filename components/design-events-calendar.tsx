@@ -1540,8 +1540,17 @@ export default function DesignEventsCalendar() {
                 </div>
               </div>
 
-              {viewMode === "calendar" ? (
-                <div className="flex-1 grid grid-cols-7 gap-px bg-border border border-border">
+              <AnimatePresence mode="wait">
+                {viewMode === "calendar" ? (
+                  <motion.div 
+                    key="calendar-view"
+                    initial={{ opacity: 0, rotateX: 90, scale: 0.8, z: -100 }}
+                    animate={{ opacity: 1, rotateX: 0, scale: 1, z: 0 }}
+                    exit={{ opacity: 0, rotateX: -90, scale: 0.8, z: -100 }}
+                    transition={{ duration: 0.4, ease: "easeOut" }}
+                    className="flex-1 grid grid-cols-7 gap-px bg-border border border-border"
+                    style={{ transformPerspective: 1200 }}
+                  >
                   {monthData.map((day, index) => {
                     const cellId = `${month}-${day.date}`
                     const isCurrentDay = isToday(day.date)
@@ -1670,9 +1679,17 @@ export default function DesignEventsCalendar() {
                   </div>
                   );
                 })}
-              </div>
-              ) : (
-                <div className="flex-1 space-y-6">
+                  </motion.div>
+                ) : (
+                  <motion.div 
+                    key="list-view"
+                    initial={{ opacity: 0, rotateX: -90, scale: 1.2, z: 100 }}
+                    animate={{ opacity: 1, rotateX: 0, scale: 1, z: 0 }}
+                    exit={{ opacity: 0, rotateX: 90, scale: 1.2, z: 100 }}
+                    transition={{ duration: 0.4, ease: "easeOut" }}
+                    className="flex-1 space-y-6"
+                    style={{ transformPerspective: 1200 }}
+                  >
                   {(() => {
                     const monthEvents = filteredEvents.filter(e => e.month === month)
                     monthEvents.sort((a, b) => a.startDay - b.startDay)
@@ -1753,8 +1770,9 @@ export default function DesignEventsCalendar() {
                       )
                     })
                   })()}
-                </div>
-              )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           )
         })}
