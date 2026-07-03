@@ -62,13 +62,7 @@ import {
   VolumeX,
   LogOut,
   ChevronRight,
-  Calendar as CalendarIcon,
-  Snowflake,
-  CloudRain,
-  Cloud,
-  CloudLightning,
-  Flower2,
-  Leaf
+  Calendar as CalendarIcon
 } from "lucide-react"
 import { SpotlightCard } from "@/components/ui/spotlight-card"
 import { HackerText } from "@/components/ui/hacker-text"
@@ -86,34 +80,8 @@ const dayColors = [
   [[255, 50, 150]],  // 3: Thursday (Bold Pink)
   [[205, 100, 50]],  // 4: Friday (Bold Brown/Orange)
   [[160, 50, 255]],  // 5: Saturday (Bold Purple)
-  [[255, 100, 100]], // 6: Sunday (Bold Red)
+  [[255, 30, 30]],   // 6: Sunday (Bold Red)
 ]
-
-const MonthWeatherIcon = ({ month }: { month: string }) => {
-  switch (month.toLowerCase()) {
-    case 'january':
-    case 'december':
-      return <motion.div animate={{ rotate: 360 }} transition={{ duration: 10, repeat: Infinity, ease: "linear" }}><Snowflake className="text-cyan-400 w-8 h-8 opacity-80" /></motion.div>;
-    case 'february':
-      return <motion.div animate={{ y: [0, -5, 0] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}><CloudRain className="text-blue-400 w-8 h-8 opacity-80" /></motion.div>;
-    case 'march':
-    case 'november':
-      return <motion.div animate={{ x: [-2, 2, -2] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}><Cloud className="text-gray-400 w-8 h-8 opacity-80" /></motion.div>;
-    case 'april':
-      return <motion.div animate={{ y: [0, -5, 0] }} transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}><CloudLightning className="text-indigo-400 w-8 h-8 opacity-80" /></motion.div>;
-    case 'may':
-      return <motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}><Flower2 className="text-pink-400 w-8 h-8 opacity-80" /></motion.div>;
-    case 'june':
-    case 'july':
-    case 'august':
-      return <motion.div animate={{ rotate: 360, scale: [1, 1.1, 1] }} transition={{ rotate: { duration: 10, repeat: Infinity, ease: "linear" }, scale: { duration: 2, repeat: Infinity, ease: "easeInOut" } }}><Sun className="text-yellow-500 w-8 h-8 opacity-80" /></motion.div>;
-    case 'september':
-    case 'october':
-      return <motion.div animate={{ rotate: [-10, 10, -10] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}><Leaf className="text-orange-500 w-8 h-8 opacity-80" /></motion.div>;
-    default:
-      return null;
-  }
-}
 
 const CrosshairIcon = ({ className, ...rest }: any) => {
   return (
@@ -1594,9 +1562,8 @@ export default function DesignEventsCalendar() {
                     cr={1}
                   />
                 </div>
-                <div className="sticky top-[190px] lg:top-[240px] self-start h-fit bg-background/90 backdrop-blur-md z-10 py-2 lg:py-0 -mx-6 px-6 lg:mx-0 lg:px-0 flex items-center gap-3">
+                <div className="sticky top-[190px] lg:top-[240px] self-start h-fit bg-background/90 backdrop-blur-md z-10 py-2 lg:py-0 -mx-6 px-6 lg:mx-0 lg:px-0">
                   <HackerText className="text-3xl lg:text-4xl font-thin" text={month} />
-                  <MonthWeatherIcon month={month} />
                 </div>
               </div>
 
