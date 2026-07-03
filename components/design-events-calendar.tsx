@@ -66,6 +66,8 @@ import { motion, AnimatePresence } from "framer-motion"
 import { EventideLogo } from "@/components/ui/text-swiper"
 import { CanvasRevealEffect } from "@/components/ui/canvas-reveal-effect"
 import { DotPattern } from "@/components/ui/dot-pattern"
+import { HackerText } from "@/components/ui/hacker-text"
+import { SpotlightCard } from "@/components/ui/spotlight-card"
 
 const dayColors = [
   [[0, 255, 100]],   // 0: Monday (Bold Green)
@@ -1478,7 +1480,7 @@ export default function DesignEventsCalendar() {
                   />
                 </div>
                 <div className="sticky top-[190px] lg:top-[240px] self-start h-fit bg-background/90 backdrop-blur-md z-10 py-2 lg:py-0 -mx-6 px-6 lg:mx-0 lg:px-0">
-                  <h2 className="text-3xl lg:text-4xl font-thin">{month}</h2>
+                  <HackerText className="text-3xl lg:text-4xl font-thin" text={month} />
                 </div>
               </div>
 
@@ -1542,7 +1544,7 @@ export default function DesignEventsCalendar() {
                               const isSaved = isEventSaved(event)
 
                               return (
-                                <div
+                                <SpotlightCard
                                   key={eventIndex}
                                   onClick={(e) => {
                                     e.stopPropagation()
@@ -1580,7 +1582,7 @@ export default function DesignEventsCalendar() {
                                     </div>
                                   )}
 
-                                  <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-20">
                                     {session && (
                                       <button
                                         onClick={(e) => handleSaveEvent(e, event.id!)}
@@ -1591,7 +1593,7 @@ export default function DesignEventsCalendar() {
                                       </button>
                                     )}
                                 </div>
-                              </div>
+                              </SpotlightCard>
                             )
                           })}
                         </div>
