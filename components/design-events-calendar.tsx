@@ -13,6 +13,7 @@ import { ProgressiveBlur } from "@/components/ui/progressive-blur"
 import { ThemeToggleButton } from "./theme-toggle"
 import { useSession, signIn, signOut } from "next-auth/react"
 import { getEvents, addEvent, toggleSavedEvent, getSavedEvents, registerUser, updateEvent, deleteEvent } from "@/app/actions"
+import { updateEventDate } from "@/app/actions/updateEvent"
 import { Label } from "@/components/ui/label"
 import Cropper from 'react-easy-crop'
 import type { Area } from 'react-easy-crop'
@@ -1564,6 +1565,41 @@ export default function DesignEventsCalendar() {
                       onClick={() => {
                         if (day.date) openAddEventDialog(day.date, month)
                       }}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        if (day.date) e.currentTarget.classList.add('bg-accent/80');
+                      }}
+                      onDragLeave={(e) => {
+                        e.currentTarget.classList.remove('bg-accent/80');
+                      }}
+                      onDrop={async (e) => {
+                        e.preventDefault();
+                        e.currentTarget.classList.remove('bg-accent/80');
+                        if (!day.date) return;
+                        
+                        const eventId = e.dataTransfer.getData('eventId');
+                        if (!eventId) return;
+
+                        // Optimistic update
+                        const eventToUpdate = localEvents.find(ev => ev.id === eventId);
+                        if (eventToUpdate && (eventToUpdate.startDay !== day.date || eventToUpdate.month !== month)) {
+                          const originalDay = eventToUpdate.startDay;
+                          const originalMonth = eventToUpdate.month;
+                          
+                          setLocalEvents(prev => prev.map(ev => 
+                            ev.id === eventId ? { ...ev, startDay: day.date!, month: month } : ev
+                          ));
+
+                          const res = await updateEventDate(eventId, day.date, month);
+                          if (!res.success) {
+                            // Revert on failure
+                            setLocalEvents(prev => prev.map(ev => 
+                              ev.id === eventId ? { ...ev, startDay: originalDay, month: originalMonth } : ev
+                            ));
+                            alert(res.error || "Failed to update event date");
+                          }
+                        }
+                      }}
                       className={`relative bg-background p-1 sm:p-2 min-h-[80px] sm:min-h-[120px] transition-colors hover:bg-accent/50 ${day.date ? "cursor-pointer group/cell" : ""} ${
                         isCurrentDay ? "ring-2 ring-inset ring-primary" : ""
                       }`}
@@ -1620,57 +1656,67 @@ export default function DesignEventsCalendar() {
                               const isSaved = isEventSaved(event)
 
                               return (
-                                <SpotlightCard
+                                <div 
                                   key={eventIndex}
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    handleEventClick(event)
+                                  draggable
+                                  onDragStart={(e) => {
+                                    e.stopPropagation();
+                                    e.dataTransfer.setData('eventId', event.id!);
+                                    e.dataTransfer.effectAllowed = 'move';
                                   }}
-                                  className={`block text-[9px] sm:text-xs p-1 sm:p-2.5 border-l-2 sm:border-l-[3px] rounded-r-md transition-all hover:pl-2 sm:hover:pl-3.5 cursor-pointer group relative shadow-sm ${
-                                    event.color === "Blue" ? "border-blue-500 bg-blue-500/10 hover:bg-blue-500/20" :
-                                    event.color === "Red" ? "border-red-500 bg-red-500/10 hover:bg-red-500/20" :
-                                    event.color === "Green" ? "border-green-500 bg-green-500/10 hover:bg-green-500/20" :
-                                    event.color === "Orange" ? "border-orange-500 bg-orange-500/10 hover:bg-orange-500/20" :
-                                    event.color === "Purple" ? "border-purple-500 bg-purple-500/10 hover:bg-purple-500/20" :
-                                    "border-primary bg-primary/5 hover:bg-primary/10"
-                                  }`}
+                                  className="cursor-grab active:cursor-grabbing"
                                 >
-                                  <div className={`font-semibold leading-tight mb-0.5 line-clamp-1 sm:line-clamp-none break-all sm:break-normal ${
-                                    event.color === "Blue" ? "text-blue-400 group-hover/cell:text-blue-300" :
-                                    event.color === "Red" ? "text-red-400 group-hover/cell:text-red-300" :
-                                    event.color === "Green" ? "text-green-400 group-hover/cell:text-green-300" :
-                                    event.color === "Orange" ? "text-orange-400 group-hover/cell:text-orange-300" :
-                                    event.color === "Purple" ? "text-purple-400 group-hover/cell:text-purple-300" :
-                                    (isCurrentDay ? "text-white" : "text-foreground group-hover/cell:text-white")
-                                  }`}>{event.name}</div>
-                                  {event.edition && (
-                                    <span className={`hidden sm:inline-block mt-1 text-[10px] px-1 py-0.5 rounded ${isCurrentDay ? "bg-white/10 text-white" : "bg-background group-hover/cell:bg-white/10 group-hover/cell:text-white"}`}>
-                                      {event.edition}
-                                    </span>
-                                  )}
-                                  <div className={`hidden sm:flex mt-1 items-center ${isCurrentDay ? "text-white/80" : "text-muted-foreground/80 group-hover/cell:text-white/80"}`}>
-                                    <Clock className="h-3 w-3 mr-1" />
-                                    <span>{event.time}</span>
-                                  </div>
-                                  {event.location && (
-                                    <div className={`hidden sm:flex mt-1 items-center justify-between ${isCurrentDay ? "text-white/70" : "text-muted-foreground group-hover/cell:text-white/70"}`}>
-                                      <span>{event.location} {event.flag}</span>
-                                    </div>
-                                  )}
-
-                                  <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-20">
-                                    {session && (
-                                      <button
-                                        onClick={(e) => handleSaveEvent(e, event.id!)}
-                                        className={`p-1 hover:bg-background rounded ${isSaved ? "opacity-100" : ""}`}
-                                        title={isSaved ? "Remove from saved" : "Save event"}
-                                      >
-                                        <Heart className={`h-3 w-3 ${isSaved ? "fill-current text-red-500" : ""}`} />
-                                      </button>
+                                  <SpotlightCard
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      handleEventClick(event)
+                                    }}
+                                    className={`block text-[9px] sm:text-xs p-1 sm:p-2.5 border-l-2 sm:border-l-[3px] rounded-r-md transition-all hover:pl-2 sm:hover:pl-3.5 cursor-pointer group relative shadow-sm ${
+                                      event.color === "Blue" ? "border-blue-500 bg-blue-500/10 hover:bg-blue-500/20" :
+                                      event.color === "Red" ? "border-red-500 bg-red-500/10 hover:bg-red-500/20" :
+                                      event.color === "Green" ? "border-green-500 bg-green-500/10 hover:bg-green-500/20" :
+                                      event.color === "Orange" ? "border-orange-500 bg-orange-500/10 hover:bg-orange-500/20" :
+                                      event.color === "Purple" ? "border-purple-500 bg-purple-500/10 hover:bg-purple-500/20" :
+                                      "border-primary bg-primary/5 hover:bg-primary/10"
+                                    }`}
+                                  >
+                                    <div className={`font-semibold leading-tight mb-0.5 line-clamp-1 sm:line-clamp-none break-all sm:break-normal ${
+                                      event.color === "Blue" ? "text-blue-400 group-hover/cell:text-blue-300" :
+                                      event.color === "Red" ? "text-red-400 group-hover/cell:text-red-300" :
+                                      event.color === "Green" ? "text-green-400 group-hover/cell:text-green-300" :
+                                      event.color === "Orange" ? "text-orange-400 group-hover/cell:text-orange-300" :
+                                      event.color === "Purple" ? "text-purple-400 group-hover/cell:text-purple-300" :
+                                      (isCurrentDay ? "text-white" : "text-foreground group-hover/cell:text-white")
+                                    }`}>{event.name}</div>
+                                    {event.edition && (
+                                      <span className={`hidden sm:inline-block mt-1 text-[10px] px-1 py-0.5 rounded ${isCurrentDay ? "bg-white/10 text-white" : "bg-background group-hover/cell:bg-white/10 group-hover/cell:text-white"}`}>
+                                        {event.edition}
+                                      </span>
                                     )}
-                                </div>
-                              </SpotlightCard>
-                            )
+                                    <div className={`hidden sm:flex mt-1 items-center ${isCurrentDay ? "text-white/80" : "text-muted-foreground/80 group-hover/cell:text-white/80"}`}>
+                                      <Clock className="h-3 w-3 mr-1" />
+                                      <span>{event.time}</span>
+                                    </div>
+                                    {event.location && (
+                                      <div className={`hidden sm:flex mt-1 items-center justify-between ${isCurrentDay ? "text-white/70" : "text-muted-foreground group-hover/cell:text-white/70"}`}>
+                                        <span>{event.location} {event.flag}</span>
+                                      </div>
+                                    )}
+
+                                    <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+                                      {session && (
+                                        <button
+                                          onClick={(e) => handleSaveEvent(e, event.id!)}
+                                          className={`p-1 hover:bg-background rounded ${isSaved ? "opacity-100" : ""}`}
+                                          title={isSaved ? "Remove from saved" : "Save event"}
+                                        >
+                                          <Heart className={`h-3 w-3 ${isSaved ? "fill-current text-red-500" : ""}`} />
+                                        </button>
+                                      )}
+                                  </div>
+                                </SpotlightCard>
+                              </div>
+                              )
                           })}
                         </div>
                       </>
