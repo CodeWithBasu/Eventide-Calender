@@ -567,6 +567,7 @@ export default function DesignEventsCalendar() {
     setIsLoading(true)
     const result = await updateEvent(selectedEvent.id, {
       ...editEventData,
+      startDateISO: editEventData.startTime ? new Date(editEventData.startTime).toISOString() : null,
       month: selectedEvent.month,
       startDay: selectedEvent.startDay,
       endDay: selectedEvent.endDay,
