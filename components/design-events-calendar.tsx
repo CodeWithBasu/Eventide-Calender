@@ -276,7 +276,24 @@ export default function DesignEventsCalendar() {
   const subscribeToPush = async () => {
     try {
       setIsPushSubscribing(true)
-      const registration = await navigator.serviceWorker.ready
+
+      if (!("Notification" in window)) {
+        throw new Error("This browser does not support desktop notification")
+      }
+
+      const permission = await Notification.requestPermission()
+      if (permission !== "granted") {
+        throw new Error("Permission not granted for Notification")
+      }
+
+      let registration = await navigator.serviceWorker.getRegistration()
+      if (!registration) {
+        registration = await navigator.serviceWorker.register("/sw.js")
+      }
+      
+      // Wait for it to be ready
+      registration = await navigator.serviceWorker.ready
+
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || ""),
