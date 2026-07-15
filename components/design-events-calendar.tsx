@@ -651,6 +651,18 @@ export default function DesignEventsCalendar() {
     if (res.success && res.event) {
       setLocalEvents((prev) => [res.event as any, ...prev])
       setAddEventDialogOpen(false)
+      
+      // Auto-save the newly created event so the creator gets push notifications
+      if (session?.user && (session.user as any).id) {
+        await toggleSavedEvent((session.user as any).id, res.event.id);
+        setSavedEventIds((prev) => {
+          if (!prev.includes(res.event.id)) {
+            return [...prev, res.event.id];
+          }
+          return prev;
+        });
+      }
+
       setNewEvent({
         title: "",
         description: "",
