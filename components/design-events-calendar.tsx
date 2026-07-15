@@ -117,6 +117,21 @@ const months = [
 const continents = ["Asia", "Europe", "Latin America", "North America", "Oceania", "Africa", "Middle East", "Online"]
 const eventTypes = ["conference", "workshop", "meetup", "festival", "online"] as const
 
+function urlBase64ToUint8Array(base64String: string) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding)
+    .replace(/\-/g, '+')
+    .replace(/_/g, '/');
+
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
+
 export default function DesignEventsCalendar() {
   const [selectedContinent, setSelectedContinent] = useState<string | null>(null)
   const [selectedEventType, setSelectedEventType] = useState<string | null>(null)
@@ -145,6 +160,7 @@ export default function DesignEventsCalendar() {
   const { data: session, status, update: updateSession } = useSession()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isAvatarUploading, setIsAvatarUploading] = useState(false)
+  const [isPushSubscribing, setIsPushSubscribing] = useState(false)
   const [cropImageSrc, setCropImageSrc] = useState<string | null>(null)
   const [crop, setCrop] = useState({ x: 0, y: 0 })
   const [zoom, setZoom] = useState(1)
@@ -256,6 +272,34 @@ export default function DesignEventsCalendar() {
   const handleCropComplete = useCallback((croppedArea: Area, croppedAreaPixels: Area) => {
     setCroppedAreaPixels(croppedAreaPixels)
   }, [])
+
+  const subscribeToPush = async () => {
+    try {
+      setIsPushSubscribing(true)
+      const registration = await navigator.serviceWorker.ready
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || ""),
+      })
+      
+      const response = await fetch("/api/push/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(subscription)
+      })
+      
+      if (response.ok) {
+        toast({ title: "Success", description: "Push notifications enabled!" })
+      } else {
+        throw new Error("Failed to subscribe")
+      }
+    } catch (error) {
+      console.error(error)
+      toast({ title: "Error", description: "Could not enable push notifications.", variant: "destructive" })
+    } finally {
+      setIsPushSubscribing(false)
+    }
+  }
 
   const generateCroppedImage = async () => {
     if (!cropImageSrc || !croppedAreaPixels) return
@@ -1171,6 +1215,9 @@ export default function DesignEventsCalendar() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
                           {isAvatarUploading ? "Uploading..." : "Change Avatar"}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={subscribeToPush} disabled={isPushSubscribing}>
+                          {isPushSubscribing ? "Enabling..." : "Enable Push Notifications"}
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => signOut()}>Sign Out</DropdownMenuItem>
                       </DropdownMenuContent>

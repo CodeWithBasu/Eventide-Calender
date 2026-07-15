@@ -14,8 +14,9 @@ model User {
   name          String?
   image         String?
   createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-  savedEvents   SavedEvent[]
+  updatedAt         DateTime           @updatedAt
+  savedEvents       SavedEvent[]
+  pushSubscriptions PushSubscription[]
 }
 
 model Event {
@@ -33,8 +34,10 @@ model Event {
   url         String
   time        String       // e.g., "2:30 PM - 6:00 PM"
   edition     String?
-  tags        String       // Comma separated string for simplicity, or we can use a related table. Let's use string for now.
-  createdAt   DateTime     @default(now())
+  tags          String       // Comma separated string for simplicity, or we can use a related table. Let's use string for now.
+  startDateTime DateTime?
+  endDateTime   DateTime?
+  createdAt     DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   savedBy     SavedEvent[]
 }
@@ -48,4 +51,14 @@ model SavedEvent {
   createdAt DateTime @default(now())
 
   @@unique([userId, eventId])
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint  String
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
 }
