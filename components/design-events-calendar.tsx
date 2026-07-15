@@ -140,10 +140,48 @@ export default function DesignEventsCalendar() {
   const [hoveredDateCell, setHoveredDateCell] = useState<string | null>(null)
   const [timeProgress, setTimeProgress] = useState(0)
   const [isSoundEnabled, setIsSoundEnabled] = useState(true)
+  const [userLocation, setUserLocation] = useState("")
 
   useEffect(() => {
     toggleSounds(isSoundEnabled)
   }, [isSoundEnabled])
+
+  useEffect(() => {
+    // Determine the user's location initially (defaulting to NYC if not permitted)
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude
+          const lng = position.coords.longitude
+          setUserLocation(`${lat.toFixed(4)},${lng.toFixed(4)}`)
+        },
+        () => {
+          // If the user denies or there's an error, fallback to NYC coordinates
+          setUserLocation("40.7128,-74.0060")
+        }
+      )
+    } else {
+      setUserLocation("40.7128,-74.0060")
+    }
+
+    // Check if push is already enabled
+    const checkPushSubscription = async () => {
+      try {
+        if ("serviceWorker" in navigator && "PushManager" in window) {
+          const registration = await navigator.serviceWorker.getRegistration()
+          if (registration) {
+            const subscription = await registration.pushManager.getSubscription()
+            if (subscription) {
+              setIsPushEnabled(true)
+            }
+          }
+        }
+      } catch (e) {
+        // Ignore
+      }
+    }
+    checkPushSubscription()
+  }, [])
 
   useEffect(() => {
     const updateProgress = () => {
@@ -161,6 +199,7 @@ export default function DesignEventsCalendar() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isAvatarUploading, setIsAvatarUploading] = useState(false)
   const [isPushSubscribing, setIsPushSubscribing] = useState(false)
+  const [isPushEnabled, setIsPushEnabled] = useState(false)
   const [cropImageSrc, setCropImageSrc] = useState<string | null>(null)
   const [crop, setCrop] = useState({ x: 0, y: 0 })
   const [zoom, setZoom] = useState(1)
@@ -307,6 +346,7 @@ export default function DesignEventsCalendar() {
       
       if (response.ok) {
         toast({ title: "Success", description: "Push notifications enabled!" })
+        setIsPushEnabled(true)
       } else {
         throw new Error("Failed to subscribe")
       }
@@ -943,15 +983,17 @@ export default function DesignEventsCalendar() {
                               <LogOut className="h-4 w-4 text-muted-foreground hover:text-red-400" onClick={(e) => { e.stopPropagation(); signOut(); setIsMobileSheetOpen(false); }} />
                             </div>
 
-                            <button onClick={subscribeToPush} disabled={isPushSubscribing} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-accent hover:text-accent-foreground active:scale-[0.98] transition-all mt-2 disabled:opacity-50">
-                              <div className="flex items-center gap-4">
-                                <div className="h-6 w-6 rounded-full bg-blue-500/20 flex items-center justify-center shrink-0">
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                            {!isPushEnabled && (
+                              <button onClick={subscribeToPush} disabled={isPushSubscribing} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-accent hover:text-accent-foreground active:scale-[0.98] transition-all mt-2 disabled:opacity-50">
+                                <div className="flex items-center gap-4">
+                                  <div className="h-6 w-6 rounded-full bg-blue-500/20 flex items-center justify-center shrink-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                                  </div>
+                                  <span className="text-lg">{isPushSubscribing ? "Enabling..." : "Enable Notifications"}</span>
                                 </div>
-                                <span className="text-lg">{isPushSubscribing ? "Enabling..." : "Enable Notifications"}</span>
-                              </div>
-                              <ChevronRight className="h-5 w-5 text-muted-foreground" />
-                            </button>
+                                <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                              </button>
+                            )}
                             
                             <button onClick={() => { setShowOnlySaved(!showOnlySaved); setIsMobileSheetOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-accent hover:text-accent-foreground active:scale-[0.98] transition-all mt-2">
                               <div className="flex items-center gap-4">
@@ -1243,9 +1285,11 @@ export default function DesignEventsCalendar() {
                         <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
                           {isAvatarUploading ? "Uploading..." : "Change Avatar"}
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={subscribeToPush} disabled={isPushSubscribing}>
-                          {isPushSubscribing ? "Enabling..." : "Enable Push Notifications"}
-                        </DropdownMenuItem>
+                        {!isPushEnabled && (
+                          <DropdownMenuItem onClick={subscribeToPush} disabled={isPushSubscribing}>
+                            {isPushSubscribing ? "Enabling..." : "Enable Push Notifications"}
+                          </DropdownMenuItem>
+                        )}
                         <DropdownMenuItem onClick={() => signOut()}>Sign Out</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
