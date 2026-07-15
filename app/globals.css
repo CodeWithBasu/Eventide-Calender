@@ -198,3 +198,69 @@
     }
   }
 }
+
+/* Lever Switch CSS */
+.toggle-container {
+  position: relative;
+  width: 52px;
+  height: 28px;
+  display: inline-block;
+}
+.toggle-input {
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: 10;
+  cursor: pointer;
+}
+.toggle-base {
+  width: 100%;
+  height: 100%;
+  background: #2a2a2a;
+  border-radius: 50px;
+  padding: 3px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.6), 0 1px 1px rgba(255,255,255,0.05);
+}
+.toggle-base-inside {
+  width: 100%;
+  height: 100%;
+  background: #1a1a1a;
+  border-radius: 50px;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+.toggle-input:checked ~ .toggle-base .toggle-base-inside {
+  background: #3b82f6; 
+  box-shadow: inset 0 0 8px rgba(59, 130, 246, 0.5);
+}
+.toggle-handle-wrapper {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  z-index: 5;
+}
+.toggle-input:checked ~ .toggle-handle-wrapper {
+  transform: translateX(24px);
+}
+.toggle-handle {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, #ffffff, #d4d4d8);
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.4), inset 0 2px 2px rgba(255,255,255,1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.toggle-handle-knob {
+  width: 8px;
+  height: 8px;
+  background: linear-gradient(to bottom, #d4d4d8, #a1a1aa);
+  border-radius: 50%;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.3), 0 1px 1px rgba(255,255,255,0.8);
+}
+.toggle-handle-bar-wrapper { display: none; }
+
