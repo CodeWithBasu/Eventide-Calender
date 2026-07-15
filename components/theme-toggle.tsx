@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { GripHorizontal } from "lucide-react";
 import { useTheme } from "next-themes";
 import React, { useCallback, useEffect, useState } from "react";
+import { flushSync } from "react-dom";
 
 import { cn } from "@/lib/utils";
 
@@ -493,7 +494,9 @@ export const useThemeToggle = ({
     if (typeof window === "undefined") return;
 
     const switchTheme = () => {
-      setTheme(theme === "light" ? "dark" : "light");
+      flushSync(() => {
+        setTheme(theme === "light" ? "dark" : "light");
+      });
     };
 
     if (!document.startViewTransition) {
@@ -524,7 +527,9 @@ export const useThemeToggle = ({
     if (typeof window === "undefined") return;
 
     const switchTheme = () => {
-      setTheme("light");
+      flushSync(() => {
+        setTheme("light");
+      });
     };
 
     if (!document.startViewTransition) {
@@ -545,7 +550,9 @@ export const useThemeToggle = ({
     if (typeof window === "undefined") return;
 
     const switchTheme = () => {
-      setTheme("dark");
+      flushSync(() => {
+        setTheme("dark");
+      });
     };
 
     if (!document.startViewTransition) {
@@ -570,7 +577,9 @@ export const useThemeToggle = ({
     updateStyles(animation.css, animation.name);
 
     const switchTheme = () => {
-      setTheme("system");
+      flushSync(() => {
+        setTheme("system");
+      });
     };
 
     if (!document.startViewTransition) {
