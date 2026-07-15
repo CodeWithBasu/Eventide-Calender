@@ -55,6 +55,7 @@ export async function addEvent(data: any) {
         color: data.color,
         url: "#",
         time: `${data.startTime} - ${data.endTime}`,
+        startDateTime: data.startTime ? new Date(data.startTime) : null,
         tags: data.tags?.join(",") || "",
         description: data.description
       }
@@ -80,6 +81,7 @@ export async function updateEvent(id: string, data: any) {
         category: data.category,
         color: data.color,
         time: `${data.startTime} - ${data.endTime}`,
+        startDateTime: data.startTime ? new Date(data.startTime) : null,
         tags: data.tags?.join(",") || "",
         description: data.description
       }

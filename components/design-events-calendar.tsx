@@ -642,7 +642,11 @@ export default function DesignEventsCalendar() {
     e.preventDefault()
     setIsLoading(true)
 
-    const res = await addEvent(newEvent as any)
+    const payload = {
+        ...newEvent,
+        startDateISO: newEvent.startTime ? new Date(newEvent.startTime).toISOString() : null,
+      }
+    const res = await addEvent(payload as any)
 
     if (res.success && res.event) {
       setLocalEvents((prev) => [res.event as any, ...prev])
@@ -749,6 +753,23 @@ export default function DesignEventsCalendar() {
       return startDate.toLocaleDateString("en-US", options)
     }
     return `${startDate.toLocaleDateString("en-US", options)} - ${endDate.toLocaleDateString("en-US", options)}`
+  }
+
+  const formatEventTime = (timeStr: string) => {
+    if (!timeStr) return "";
+    try {
+      const parts = timeStr.split(" - ");
+      if (parts.length === 2) {
+        const d1 = new Date(parts[0]);
+        const d2 = new Date(parts[1]);
+        if (!isNaN(d1.getTime()) && !isNaN(d2.getTime())) {
+          const f1 = d1.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          const f2 = d2.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          return `${f1} - ${f2}`;
+        }
+      }
+    } catch (e) {}
+    return timeStr;
   }
 
   const filteredEvents = localEvents.filter((event) => {
@@ -1116,7 +1137,7 @@ export default function DesignEventsCalendar() {
                               }}
                             >
                               <div className="text-sm font-medium text-gray-200">{event.name}</div>
-                              <div className="text-xs text-gray-400">{event.month} {event.startDay} - {event.time}</div>
+                              <div className="text-xs text-gray-400">{event.month} {event.startDay} - {formatEventTime(event.time)}</div>
                             </div>
                           ))
                         ) : (
@@ -1767,7 +1788,13 @@ export default function DesignEventsCalendar() {
                             ev.id === eventId ? { ...ev, startDay: day.date!, endDay: newEndDay, month: month } : ev
                           ));
 
-                          const res = await updateEventDate(eventId, day.date, month);
+                          const payload = {
+                            ...eventToUpdate,
+                            month: month,
+                            startDay: day.date,
+                            endDay: newEndDay
+                          };
+                          const res = await updateEvent(eventId, payload as any);
                           if (!res.success) {
                             // Revert on failure
                             setLocalEvents(prev => prev.map(ev => 
@@ -1861,7 +1888,7 @@ export default function DesignEventsCalendar() {
                                     )}
                                     <div className={`hidden sm:flex mt-1 items-center ${isCurrentDay ? "text-white/80" : "text-muted-foreground/80 group-hover/cell:text-white/80"}`}>
                                       <Clock className="h-3 w-3 mr-1" />
-                                      <span>{event.time}</span>
+                                      <span>{formatEventTime(event.time)}</span>
                                     </div>
                                     {event.location && (
                                       <div className={`hidden sm:flex mt-1 items-center justify-between ${isCurrentDay ? "text-white/70" : "text-muted-foreground group-hover/cell:text-white/70"}`}>
@@ -1955,7 +1982,7 @@ export default function DesignEventsCalendar() {
                                       <div className="flex flex-wrap items-center gap-3 mt-2.5">
                                         <div className="flex items-center text-[12px] text-muted-foreground dark:text-gray-400">
                                           <Clock className="h-3.5 w-3.5 mr-1.5" />
-                                          {event.time}
+                                          {formatEventTime(event.time)}
                                         </div>
                                         {event.tags && event.tags.length > 0 && (
                                           <div className="flex items-center gap-1.5">
