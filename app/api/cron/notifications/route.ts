@@ -4,12 +4,7 @@ import webpush from "web-push";
 
 const prisma = new PrismaClient();
 
-// Configure web-push with VAPID keys
-webpush.setVapidDetails(
-  process.env.VAPID_SUBJECT || "mailto:admin@eventide.com",
-  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || "",
-  process.env.VAPID_PRIVATE_KEY || ""
-);
+  // Web push configuration goes inside the GET handler below
 
 const OFFSETS = [
   { label: "24 hours", minutes: 24 * 60 },
@@ -20,6 +15,15 @@ const OFFSETS = [
 ];
 
 export async function GET(req: Request) {
+  // Configure web-push with VAPID keys safely inside the handler
+  if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+    webpush.setVapidDetails(
+      process.env.VAPID_SUBJECT || "mailto:admin@eventide.com",
+      process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+      process.env.VAPID_PRIVATE_KEY
+    );
+  }
+
   // Security check: Only allow requests with a specific auth header or if they come from Vercel Cron
   const authHeader = req.headers.get("authorization");
   if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
