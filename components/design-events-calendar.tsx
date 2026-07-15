@@ -310,9 +310,9 @@ export default function DesignEventsCalendar() {
       } else {
         throw new Error("Failed to subscribe")
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(error)
-      toast({ title: "Error", description: "Could not enable push notifications.", variant: "destructive" })
+      toast({ title: "Error", description: error.message || "Could not enable push notifications.", variant: "destructive" })
     } finally {
       setIsPushSubscribing(false)
     }
