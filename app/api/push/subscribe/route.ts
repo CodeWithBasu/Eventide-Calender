@@ -42,3 +42,29 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
+
+export async function DELETE(req: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || !(session.user as any)?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const userId = (session.user as any).id;
+
+    const { searchParams } = new URL(req.url);
+    const endpoint = searchParams.get("endpoint");
+
+    if (!endpoint) {
+      return NextResponse.json({ error: "Missing endpoint" }, { status: 400 });
+    }
+
+    await prisma.pushSubscription.deleteMany({
+      where: { endpoint, userId },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Unsubscription error:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
+}
