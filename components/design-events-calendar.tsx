@@ -925,6 +925,16 @@ export default function DesignEventsCalendar() {
                               </div>
                               <LogOut className="h-4 w-4 text-muted-foreground hover:text-red-400" onClick={(e) => { e.stopPropagation(); signOut(); setIsMobileSheetOpen(false); }} />
                             </div>
+
+                            <button onClick={subscribeToPush} disabled={isPushSubscribing} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-accent hover:text-accent-foreground active:scale-[0.98] transition-all mt-2 disabled:opacity-50">
+                              <div className="flex items-center gap-4">
+                                <div className="h-6 w-6 rounded-full bg-blue-500/20 flex items-center justify-center shrink-0">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                                </div>
+                                <span className="text-lg">{isPushSubscribing ? "Enabling..." : "Enable Notifications"}</span>
+                              </div>
+                              <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                            </button>
                             
                             <button onClick={() => { setShowOnlySaved(!showOnlySaved); setIsMobileSheetOpen(false); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-accent hover:text-accent-foreground active:scale-[0.98] transition-all mt-2">
                               <div className="flex items-center gap-4">
