@@ -35,8 +35,8 @@ export async function GET(req: Request) {
     
     // Check for each offset
     for (const offset of OFFSETS) {
-      const targetStart = new Date(now.getTime() + offset.minutes * 60000);
-      const targetEnd = new Date(targetStart.getTime() + 15 * 60000); // 15 minute window
+      const targetStart = new Date(now.getTime() + (offset.minutes - 15) * 60000);
+      const targetEnd = new Date(now.getTime() + offset.minutes * 60000); // 15 minute window
 
       // Find events starting within this 15 min window
       const upcomingEvents = await prisma.event.findMany({
