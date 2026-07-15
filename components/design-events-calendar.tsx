@@ -1205,52 +1205,52 @@ export default function DesignEventsCalendar() {
           {selectedEvent && (
             <>
               <DialogHeader className="text-left">
-                <DialogTitle className="text-xl font-bold text-gray-100">Event Details</DialogTitle>
-                <DialogDescription className="text-gray-400 text-sm mt-1.5">
+                <DialogTitle className="text-xl font-bold text-foreground">Event Details</DialogTitle>
+                <DialogDescription className="text-muted-foreground text-sm mt-1.5">
                   View and edit event details
                 </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleUpdateEventSubmit} className="space-y-5 pt-2">
                 {/* Title */}
                 <div className="space-y-2">
-                  <Label className="text-[13px] font-semibold text-gray-200">Title</Label>
+                  <Label className="text-[13px] font-semibold text-foreground">Title</Label>
                   <SmoothInput
                     required
                     type="text"
                     value={editEventData.title}
                     onChange={(e) => setEditEventData({ ...editEventData, title: e.target.value })}
-                    wrapperClassName="border border-[#2a2a2c] rounded-md"
+                    wrapperClassName="border border-border rounded-md"
                   />
                 </div>
 
                 {/* Description */}
                 <div className="space-y-2">
-                  <Label className="text-[13px] font-semibold text-gray-200">Description</Label>
+                  <Label className="text-[13px] font-semibold text-foreground">Description</Label>
                   <textarea
                     value={editEventData.description}
                     onChange={(e) => setEditEventData({ ...editEventData, description: e.target.value })}
-                    className="flex min-h-[90px] w-full rounded-md border border-[#2a2a2c] bg-[#121214] px-3 py-3 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
+                    className="flex min-h-[90px] w-full rounded-md border border-border bg-background px-3 py-3 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
                   />
                 </div>
 
                 {/* Start Time and End Time */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-[13px] font-semibold text-gray-200">Start Time</Label>
+                    <Label className="text-[13px] font-semibold text-foreground">Start Time</Label>
                     <Input
                       type="datetime-local"
                       value={editEventData.startTime}
                       onChange={(e) => setEditEventData({ ...editEventData, startTime: e.target.value })}
-                      className="bg-[#121214] border-[#2a2a2c] h-11 w-full [color-scheme:dark] pr-3 text-sm"
+                      className="bg-background border-border h-11 w-full dark:[color-scheme:dark] pr-3 text-sm"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-[13px] font-semibold text-gray-200">End Time</Label>
+                    <Label className="text-[13px] font-semibold text-foreground">End Time</Label>
                     <Input
                       type="datetime-local"
                       value={editEventData.endTime}
                       onChange={(e) => setEditEventData({ ...editEventData, endTime: e.target.value })}
-                      className="bg-[#121214] border-[#2a2a2c] h-11 w-full [color-scheme:dark] pr-3 text-sm"
+                      className="bg-background border-border h-11 w-full dark:[color-scheme:dark] pr-3 text-sm"
                     />
                   </div>
                 </div>
@@ -1258,12 +1258,12 @@ export default function DesignEventsCalendar() {
                 {/* Category and Color */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-[13px] font-semibold text-gray-200">Category</Label>
+                    <Label className="text-[13px] font-semibold text-foreground">Category</Label>
                     <div className="relative">
                       <select
                         value={editEventData.category}
                         onChange={(e) => setEditEventData({ ...editEventData, category: e.target.value })}
-                        className="w-full bg-[#121214] border border-[#2a2a2c] text-sm rounded-md h-11 px-3 appearance-none focus:outline-none focus:ring-1 focus:ring-ring"
+                        className="w-full bg-background border border-border text-sm rounded-md h-11 px-3 appearance-none focus:outline-none focus:ring-1 focus:ring-ring text-foreground"
                       >
                         {eventTypes.map(t => <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>)}
                         <option value="Meeting">Meeting</option>
@@ -1274,12 +1274,12 @@ export default function DesignEventsCalendar() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-[13px] font-semibold text-gray-200">Color</Label>
+                    <Label className="text-[13px] font-semibold text-foreground">Color</Label>
                     <div className="relative">
                       <select
                         value={editEventData.color}
                         onChange={(e) => setEditEventData({ ...editEventData, color: e.target.value })}
-                        className="w-full bg-[#121214] border border-[#2a2a2c] text-sm rounded-md h-11 pl-9 pr-3 appearance-none focus:outline-none focus:ring-1 focus:ring-ring"
+                        className="w-full bg-background border border-border text-sm rounded-md h-11 pl-9 pr-3 appearance-none focus:outline-none focus:ring-1 focus:ring-ring text-foreground"
                       >
                         <option value="Blue">Blue</option>
                         <option value="Red">Red</option>
@@ -1305,7 +1305,7 @@ export default function DesignEventsCalendar() {
 
                 {/* Tags */}
                 <div className="space-y-2.5">
-                  <Label className="text-[13px] font-semibold text-gray-200">Tags</Label>
+                  <Label className="text-[13px] font-semibold text-foreground">Tags</Label>
                   <div className="flex flex-wrap gap-2">
                     {["Important", "Urgent", "Work", "Personal", "Team", "Client"].map((tag) => (
                       <button
@@ -1319,8 +1319,8 @@ export default function DesignEventsCalendar() {
                         }}
                         className={`px-3 py-1.5 rounded-full text-[12px] font-medium transition-colors ${
                           editEventData.tags.includes(tag)
-                            ? "bg-white text-black"
-                            : "bg-transparent text-gray-300 border border-[#2a2a2c] hover:bg-[#1f1f22]"
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-transparent text-muted-foreground border border-border hover:bg-accent hover:text-accent-foreground"
                         }`}
                       >
                         {tag}
@@ -1334,7 +1334,7 @@ export default function DesignEventsCalendar() {
                   <Button
                     type="button"
                     variant="destructive"
-                    className="bg-[#ff4d4d] hover:bg-[#ff3333] text-white font-medium"
+                    className="font-medium"
                     onClick={handleDeleteEvent}
                     disabled={isLoading}
                   >
@@ -1343,13 +1343,13 @@ export default function DesignEventsCalendar() {
                   <Button
                     type="button"
                     variant="outline"
-                    className="bg-transparent border-[#2a2a2c] text-white hover:bg-[#1f1f22] hover:text-white font-medium"
+                    className="bg-transparent border-border text-foreground hover:bg-accent hover:text-accent-foreground font-medium"
                     onClick={() => setEventDialogOpen(false)}
                     disabled={isLoading}
                   >
                     Cancel
                   </Button>
-                  <Button type="submit" className="bg-white text-black hover:bg-gray-200 font-medium" disabled={isLoading}>
+                  <Button type="submit" className="bg-primary text-primary-foreground hover:bg-primary/90 font-medium" disabled={isLoading}>
                     Save
                   </Button>
                 </div>
@@ -1360,59 +1360,59 @@ export default function DesignEventsCalendar() {
       </Dialog>
 
       <Dialog open={addEventDialogOpen} onOpenChange={setAddEventDialogOpen}>
-        <DialogContent className="sm:max-w-[450px] p-6 bg-[#0f0f11] border-[#2a2a2c] text-foreground">
+        <DialogContent className="sm:max-w-[450px] p-6 bg-background border-border text-foreground">
           <DialogHeader className="text-left">
-            <DialogTitle className="text-xl font-bold text-gray-100">Add Event for {addEventDate?.month} {addEventDate?.day}</DialogTitle>
-            <DialogDescription className="text-gray-400 text-sm mt-1.5">
+            <DialogTitle className="text-xl font-bold text-foreground">Add Event for {addEventDate?.month} {addEventDate?.day}</DialogTitle>
+            <DialogDescription className="text-muted-foreground text-sm mt-1.5">
               Create a custom event for this day. It will appear on your calendar immediately.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleAddEventSubmit} className="space-y-5 pt-2">
             {/* Title */}
             <div className="space-y-2">
-              <Label className="text-[13px] font-semibold text-gray-200">Title</Label>
+              <Label className="text-[13px] font-semibold text-foreground">Title</Label>
               <SmoothInput
                 required
                 type="text"
                 value={newEvent.title}
                 onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
                 placeholder="Event title"
-                wrapperClassName="border border-[#2a2a2c] rounded-md"
+                wrapperClassName="border border-border rounded-md"
               />
             </div>
 
             {/* Description */}
             <div className="space-y-2">
-              <Label className="text-[13px] font-semibold text-gray-200">Description</Label>
+              <Label className="text-[13px] font-semibold text-foreground">Description</Label>
               <textarea
                 value={newEvent.description}
                 onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
                 placeholder="Event description"
-                className="flex min-h-[90px] w-full rounded-md border border-[#2a2a2c] bg-[#121214] px-3 py-3 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
+                className="flex min-h-[90px] w-full rounded-md border border-border bg-background px-3 py-3 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
               />
             </div>
 
             {/* Start / End Time */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-[13px] font-semibold text-gray-200">Start Time</Label>
+                <Label className="text-[13px] font-semibold text-foreground">Start Time</Label>
                 <div className="relative">
                   <Input
                     type="datetime-local"
                     value={newEvent.startTime}
                     onChange={(e) => setNewEvent({ ...newEvent, startTime: e.target.value })}
-                    className="bg-[#121214] border-[#2a2a2c] h-11 w-full [color-scheme:dark] pr-3 text-sm"
+                    className="bg-background border-border h-11 w-full dark:[color-scheme:dark] pr-3 text-sm"
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-[13px] font-semibold text-gray-200">End Time</Label>
+                <Label className="text-[13px] font-semibold text-foreground">End Time</Label>
                 <div className="relative">
                   <Input
                     type="datetime-local"
                     value={newEvent.endTime}
                     onChange={(e) => setNewEvent({ ...newEvent, endTime: e.target.value })}
-                    className="bg-[#121214] border-[#2a2a2c] h-11 w-full [color-scheme:dark] pr-3 text-sm"
+                    className="bg-background border-border h-11 w-full dark:[color-scheme:dark] pr-3 text-sm"
                   />
                 </div>
               </div>
@@ -1421,12 +1421,12 @@ export default function DesignEventsCalendar() {
             {/* Category / Color */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-[13px] font-semibold text-gray-200">Category</Label>
+                <Label className="text-[13px] font-semibold text-foreground">Category</Label>
                 <div className="relative">
                   <select
                     value={newEvent.category}
                     onChange={(e) => setNewEvent({ ...newEvent, category: e.target.value })}
-                    className="flex h-11 w-full rounded-md border border-[#2a2a2c] bg-[#121214] px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring text-gray-200 appearance-none"
+                    className="flex h-11 w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring text-foreground appearance-none"
                   >
                     <option value="Meeting">Meeting</option>
                     <option value="Conference">Conference</option>
@@ -1437,12 +1437,12 @@ export default function DesignEventsCalendar() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-[13px] font-semibold text-gray-200">Color</Label>
+                <Label className="text-[13px] font-semibold text-foreground">Color</Label>
                 <div className="relative flex items-center">
                   <select
                     value={newEvent.color}
                     onChange={(e) => setNewEvent({ ...newEvent, color: e.target.value })}
-                    className="flex h-11 w-full rounded-md border border-[#2a2a2c] bg-[#121214] pl-10 pr-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring appearance-none text-gray-200"
+                    className="flex h-11 w-full rounded-md border border-border bg-background pl-10 pr-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring appearance-none text-foreground"
                   >
                     <option value="Blue">Blue</option>
                     <option value="Red">Red</option>
@@ -1468,7 +1468,7 @@ export default function DesignEventsCalendar() {
 
             {/* Tags */}
             <div className="space-y-2.5">
-              <Label className="text-[13px] font-semibold text-gray-200">Tags</Label>
+              <Label className="text-[13px] font-semibold text-foreground">Tags</Label>
               <div className="flex flex-wrap gap-2">
                 {["Important", "Urgent", "Work", "Personal", "Team", "Client"].map((tag) => (
                   <button
@@ -1482,8 +1482,8 @@ export default function DesignEventsCalendar() {
                     }}
                     className={`px-3 py-1.5 rounded-full text-[12px] font-medium transition-colors ${
                       newEvent.tags.includes(tag)
-                        ? "bg-white text-black"
-                        : "bg-transparent text-gray-300 border border-[#2a2a2c] hover:bg-[#1f1f22]"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-transparent text-muted-foreground border border-border hover:bg-accent hover:text-accent-foreground"
                     }`}
                   >
                     {tag}
@@ -1497,12 +1497,12 @@ export default function DesignEventsCalendar() {
               <Button
                 type="button"
                 variant="outline"
-                className="bg-transparent border-[#2a2a2c] text-white hover:bg-[#1f1f22] hover:text-white"
+                className="bg-transparent border-border text-foreground hover:bg-accent hover:text-accent-foreground"
                 onClick={() => setAddEventDialogOpen(false)}
               >
                 Cancel
               </Button>
-              <Button type="submit" className="bg-white text-black hover:bg-gray-200">
+              <Button type="submit" className="bg-primary text-primary-foreground hover:bg-primary/90">
                 Create
               </Button>
             </div>
