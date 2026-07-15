@@ -655,7 +655,7 @@ export default function DesignEventsCalendar() {
       // Auto-save the newly created event so the creator gets push notifications
       if (session?.user && (session.user as any).id) {
         await toggleSavedEvent((session.user as any).id, res.event.id);
-        setSavedEventIds((prev) => {
+        setSavedEvents((prev) => {
           if (!prev.includes(res.event.id)) {
             return [...prev, res.event.id];
           }
@@ -724,8 +724,11 @@ export default function DesignEventsCalendar() {
   }
 
   const isEventSaved = (event: Event) => {
-    const eventId = `${event.month}-${event.name}-${event.startDay}`
-    return savedEvents.includes(eventId)
+    if (event.id) {
+      return savedEvents.includes(event.id)
+    }
+    const legacyId = `${event.month}-${event.name}-${event.startDay}`
+    return savedEvents.includes(legacyId)
   }
 
   const handleEventClick = (event: Event) => {
