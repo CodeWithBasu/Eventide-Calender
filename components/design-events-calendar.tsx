@@ -63,6 +63,7 @@ import {
   VolumeX,
   LogOut,
   ChevronRight,
+  Bell,
   Calendar as CalendarIcon
 } from "lucide-react"
 import { SpotlightCard } from "@/components/ui/spotlight-card"
