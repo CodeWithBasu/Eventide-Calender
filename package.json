@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "postinstall": "prisma generate",
-    "build": "prisma db push && next build",
+    "build": "prisma db push && next build --webpack",
     "dev": "cross-env NODE_OPTIONS=--max-http-header-size=65536 next dev",
     "lint": "eslint .",
     "start": "next start"
