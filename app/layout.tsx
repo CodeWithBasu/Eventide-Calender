@@ -22,6 +22,7 @@ export const metadata: Metadata = {
   title: "Design Events Guide 2026 | UX/UI, motion and graphic design events",
   description: "Your comprehensive guide to design events, conferences, and festivals worldwide in 2026",
   generator: "v0.app",
+  manifest: "/manifest.json",
 }
 
 export default function RootLayout({
