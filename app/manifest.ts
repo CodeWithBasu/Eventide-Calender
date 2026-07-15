@@ -16,5 +16,23 @@ export default function manifest(): MetadataRoute.Manifest {
         type: "image/png",
       },
     ],
+    // @ts-ignore - Experimental PWA Widgets API
+    widgets: [
+      {
+        name: "Upcoming Design Events",
+        description: "View the next upcoming design events right on your widget board.",
+        tag: "upcoming-events-widget",
+        ms_ac_template: "/widgets/upcoming-events-template.json",
+        data: "/api/widgets/upcoming-events",
+        type: "application/json",
+        icons: [
+          {
+            src: "/icon.png",
+            sizes: "any",
+            type: "image/png"
+          }
+        ]
+      }
+    ]
   }
 }
