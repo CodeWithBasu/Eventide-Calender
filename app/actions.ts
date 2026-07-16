@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 
 const prisma = new PrismaClient();
 import bcrypt from "bcryptjs";
+import webpush from "web-push";
 
 export async function registerUser(data: any) {
   try {
@@ -143,5 +144,52 @@ export async function getSavedEvents(userId: string) {
   } catch (error) {
     console.error("Failed to fetch saved events:", error);
     return [];
+  }
+}
+
+export async function sendInstantNotification(userId: string, eventName: string) {
+  try {
+    if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+      webpush.setVapidDetails(
+        process.env.VAPID_SUBJECT || "mailto:admin@eventide.com",
+        process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+        process.env.VAPID_PRIVATE_KEY
+      );
+    } else {
+      return { success: false, error: "VAPID keys not configured" };
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: { pushSubscriptions: true }
+    });
+
+    if (!user || user.pushSubscriptions.length === 0) {
+      return { success: false, error: "No subscriptions found" };
+    }
+
+    const payload = JSON.stringify({
+      title: "Event Created & Saved!",
+      body: `Your event "${eventName}" is now perfectly tracked by the system!`,
+      url: "https://eventide-calender.vercel.app/"
+    });
+
+    for (const sub of user.pushSubscriptions) {
+      try {
+        await webpush.sendNotification(
+          { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
+          payload
+        );
+      } catch (err: any) {
+        if (err.statusCode === 410 || err.statusCode === 404) {
+          await prisma.pushSubscription.delete({ where: { id: sub.id } });
+        }
+      }
+    }
+    
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to send instant notification", error);
+    return { success: false, error: "Failed to send instant notification" };
   }
 }

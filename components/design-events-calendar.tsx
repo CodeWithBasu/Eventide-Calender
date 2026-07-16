@@ -13,7 +13,7 @@ import { ProgressiveBlur } from "@/components/ui/progressive-blur"
 import { LeverSwitch } from "@/components/ui/lever-switch"
 import { ThemeToggleButton } from "./theme-toggle"
 import { useSession, signIn, signOut } from "next-auth/react"
-import { getEvents, addEvent, toggleSavedEvent, getSavedEvents, registerUser, updateEvent, deleteEvent } from "@/app/actions"
+import { getEvents, addEvent, toggleSavedEvent, getSavedEvents, registerUser, updateEvent, deleteEvent, sendInstantNotification } from "@/app/actions"
 import { updateEventDate } from "@/app/actions/updateEvent"
 import { Label } from "@/components/ui/label"
 import Cropper from 'react-easy-crop'
@@ -537,13 +537,13 @@ export default function DesignEventsCalendar() {
     setIsLoading(true)
     const result = await addEvent({
       ...newEvent,
+      startDateISO: newEvent.startTime ? new Date(newEvent.startTime).toISOString() : null,
       month: addEventDate?.month,
       startDay: addEventDate?.day,
       endDay: addEventDate?.day,
     })
-    setIsLoading(false)
     
-    if (result.success) {
+    if (result.success && result.event) {
       toast({
         title: "Event Added",
         description: "Your event was successfully added.",
@@ -552,6 +552,30 @@ export default function DesignEventsCalendar() {
       getEvents().then((data) => {
         if (data.length > 0) setLocalEvents(data as any)
       })
+
+      if (session?.user && (session.user as any).id) {
+        // Auto-save
+        await toggleSavedEvent((session.user as any).id, result.event.id);
+        setSavedEvents((prev) => {
+          if (!prev.includes(result.event.id)) {
+            return [...prev, result.event.id];
+          }
+          return prev;
+        });
+
+        // Instant Push Notification
+        await sendInstantNotification((session.user as any).id, newEvent.title);
+      }
+
+      setNewEvent({
+        title: "",
+        description: "",
+        startTime: "",
+        endTime: "",
+        category: "Meeting",
+        color: "Blue",
+        tags: [],
+      })
     } else {
       toast({
         title: "Error",
@@ -559,6 +583,7 @@ export default function DesignEventsCalendar() {
         variant: "destructive",
       })
     }
+    setIsLoading(false)
   }
 
   const handleUpdateEventSubmit = async (e: React.FormEvent) => {
@@ -637,55 +662,6 @@ export default function DesignEventsCalendar() {
     
     setEventDialogOpen(false)
     setAddEventDialogOpen(true)
-  }
-
-  const handleAddEvent = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-
-    const payload = {
-        ...newEvent,
-        startDateISO: newEvent.startTime ? new Date(newEvent.startTime).toISOString() : null,
-      }
-    const res = await addEvent(payload as any)
-
-    if (res.success && res.event) {
-      setLocalEvents((prev) => [res.event as any, ...prev])
-      setAddEventDialogOpen(false)
-      
-      // Auto-save the newly created event so the creator gets push notifications
-      if (session?.user && (session.user as any).id) {
-        await toggleSavedEvent((session.user as any).id, res.event.id);
-        setSavedEvents((prev) => {
-          if (!prev.includes(res.event.id)) {
-            return [...prev, res.event.id];
-          }
-          return prev;
-        });
-      }
-
-      setNewEvent({
-        title: "",
-        description: "",
-        startTime: "",
-        endTime: "",
-        category: "Meeting",
-        color: "Blue",
-        tags: [],
-      })
-      toast({
-        title: "Event created successfully",
-        description: "Your custom event has been added to the calendar.",
-      })
-    } else {
-      toast({
-        title: "Error creating event",
-        description: "Something went wrong. Please try again.",
-        variant: "destructive",
-      })
-    }
-
-    setIsLoading(false)
   }
 
   const handleSaveEvent = async (e: React.MouseEvent, eventId: string) => {
